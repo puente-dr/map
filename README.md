@@ -1,5 +1,5 @@
 # map
-This project is an interactive map of all issues catalogued in our app
+This project is an interactive map of all issues catalogued in our map app
 
 ## Build 
 **Install virtual environment library**
