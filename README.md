@@ -1,4 +1,3 @@
-#testing
 # map
 This project is an interactive map of all issues catalogued in our map app
 
