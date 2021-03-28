@@ -18,7 +18,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div([
     dcc.Textarea(
         id='textarea-example',
-        value='The length of the survey df is {}'.format(len(api_survey_df)),
+        value='The length of the survey df is {}'.format((api_survey_df.size)),
         style={'width': '100%', 'height': 200},
     ),
     html.Div(id='textarea-example-output', style={'whiteSpace': 'pre-line'})
