@@ -152,7 +152,7 @@ def clean_data():
 
     #houseownership
     environmental_df['houseownership'] = environmental_df['houseownership'].replace('owned', 'Y', regex=True)
-    #environmental_df['houseownership'] = environmental_df['houseownership'].replace('rented', 'N', regex=True)
+    environmental_df['houseownership'] = environmental_df['houseownership'].replace('rented', 'N', regex=True)
 
     #latrineAccess and clinicAccess and bathroomAccess
     environmental_df = environmental_df.replace('No', 'N', regex=True)

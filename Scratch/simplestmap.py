@@ -412,7 +412,7 @@ def update_output(value):
         lat = dff['Latitude'], 
         lon = dff['Longitude'],
         color = dff['Clinic Access'],
-        color_discrete_map={'Y':'lime','N':'red'}
+        color_discrete_map={'Y':'green','N':'red'}
         hover_name="City",
         hover_data={'Latitude':False,'Longitude':False,'Clinic Access':True}
     )

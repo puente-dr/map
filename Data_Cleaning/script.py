@@ -185,7 +185,7 @@ def city_pairing(survey_df):
     return survey_df
 
 def map_formatting(survey_df, environmental_df):
-  environmental_df['houseownership'] = environmental_df['houseownership'].replace('owned', 'Y', regex=True)
+    environmental_df['houseownership'] = environmental_df['houseownership'].replace('owned', 'Y', regex=True)
     environmental_df['houseownership'] = environmental_df['houseownership'].replace('rented', 'N', regex=True)
 
 
@@ -323,4 +323,4 @@ def map_formatting(survey_df, environmental_df):
                     right_on= ['city'],how='left')
 
     cleandf3 = cleandf2.drop(columns=['city','communityname'])
-    return clean df3
+    return cleandf3
