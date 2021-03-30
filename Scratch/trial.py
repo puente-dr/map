@@ -26,8 +26,10 @@ app.layout = html.Div([
 
     html.Hr(),
 
-    dcc.Dropdown(id='options-dropdown',value=['Less Than Primary School', 'Completed Primary School', 'Completed College',
- 'Completed High School', 'Some High School', '', 'Some College'],multi=True),
+    dcc.Dropdown(id='options-dropdown',
+    multi=True,
+    value=['Less Than Primary School', 'Completed Primary School', 'Completed College',
+ 'Completed High School', 'Some High School', '', 'Some College'])
 
     html.Hr(),
 
