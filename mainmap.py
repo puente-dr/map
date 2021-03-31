@@ -36,8 +36,8 @@ all_options = {
 
 app.layout = html.Div([
     html.Div([
-        dcc.Graph(id='display-selected-values',figure={})
-        ],style={'width':'60%','display':'inline-block','margin-left':'auto','margin-right':'0'}),
+        dcc.Graph(id='display-selected-values',figure={},style={'top':'0','left':'0','position':'fixed','width':'75%'})
+        ],style={'width':'100%','display':'table','top':'0','left':'0'}),
     
     html.Div([
         html.Div([
@@ -70,10 +70,29 @@ app.layout = html.Div([
 
         html.Hr(),
 
-    ],style={'width':'35%','display':'inline-block','margin-left':'0','margin-right':'auto'}),
+    ],style={'width':'25%','position':'fixed', 'top':'0','right':'0','display':'table'}),
 
-  ])
+  ], style={'top':'0','left':'0'})
+# app.css.config.serve_locally = True
+# app.scripts.config.serve_locally = True
 
+# external_css = [
+#     "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css",
+#     "//fonts.googleapis.com/css?family=Roboto|Lato",
+#     'https://codepen.io/chriddyp/pen/bWLwgP.css',
+# ]
+
+# for css in external_css:
+#     app.css.append_css({"external_url": css})
+ 
+#@import {}
+# @font-face {
+#   font-family: 'Roboto';
+#   font-style: normal;
+#   font-weight: 400;
+#   src: local('Roboto'), local('Roboto-Regular'), url(https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2) format('woff2');
+#   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+# }
 
 @app.callback(
     Output('options-dropdown', 'options'),
@@ -116,7 +135,10 @@ def set_display_children(selected_feature, selected_option,selected_city):
 
 
     fig.update_layout(
+        autosize=True,
+        #margins=dict{l:0},
         title = 'Dominican Republic Health Data by Household<br>(Hover over map for details)',
+        title_font_family='Roboto',
         geo_scope='world',
             geo = dict(
             projection_scale=1000000, #this is kind of like zoom
@@ -125,6 +147,15 @@ def set_display_children(selected_feature, selected_option,selected_city):
     fig.update_traces(hoverinfo='lon')
     fig.update_layout(mapbox_style="mapbox://styles/msuarez9/ckmp4rt7e0qf517o1md18w9d1")
     fig.update_layout(
+        legend=dict(
+            font_family='Roboto',
+            orientation="h",
+            yanchor="bottom",
+            xanchor="left",
+            y=-.15,
+            #width = '90%'
+            #x=0
+        ),
         hoverlabel=dict(
             bgcolor="white",
             font_size=16,
