@@ -177,8 +177,8 @@ def clean_data():
     df = full_df
     
     # Create new columns for latrine or bathroom access 
-    df.loc[(df['latrineAccess'] == 'Y') | (df['bathroomAccess'] == 'Y'), 'Latrine or Bathroom Access'] = 'Y'  
-    df.loc[(df['latrineAccess'] == 'N') & (df['bathroomAccess'] == 'N'), 'Latrine or Bathroom Access'] = 'N'  
+    df.loc[(df['latrineAccess'] == 'Y') | (df['bathroomAccess'] == 'Y'), 'Latrine or Bathroom Access'] = 'Yes'  
+    df.loc[(df['latrineAccess'] == 'N') & (df['bathroomAccess'] == 'N'), 'Latrine or Bathroom Access'] = 'No'  
 
     # Change numbers to digits without decimals for numerical columns
     df['age'] = df['age'].replace('',np.nan)

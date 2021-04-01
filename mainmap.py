@@ -29,7 +29,8 @@ all_options = {
     'Water Access': ['2-3x A Week', '4-6x A Week', '1x A Month', 'Never', '1x A Week', 'Every day'],
     'Clinic Access':['Yes', 'No'],
     'Floor Condition':['Great', 'Needs Repair', 'Adequate'],
-    'Roof Condition':['Adequate', 'Needs Repair']
+    'Roof Condition':['Adequate', 'Needs Repair'],
+    'Latrine or Bathroom Access':['Yes','No']
 }
 
 #import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700&display=swap')
@@ -70,9 +71,9 @@ app.layout = html.Div([
 
         html.Hr(),
 
-    ],style={'width':'25%','position':'fixed', 'top':'0','right':'0','display':'table'}),
+    ],style={'width':'25%','position':'fixed', 'top':'1','right':'0','display':'table'}),
 
-  ], style={'top':'0','left':'0'})
+  ], style={'top':'1','left':'0'})
 # app.css.config.serve_locally = True
 # app.scripts.config.serve_locally = True
 
@@ -117,21 +118,42 @@ def set_options_value(available_options):
     Input('city-selection','value'))
 
 def set_display_children(selected_feature, selected_option,selected_city):
-    dff = df[df[selected_feature].isin(selected_option)]
-    dff = dff[dff['City (Clean)']==selected_city]
-    #dff = df[df['Roof Condition'].isin(value)]
     token = os.getenv('pk.eyJ1IjoibXN1YXJlejkiLCJhIjoiY2ttZ3F1cjZ0MDAxMjJubW5tN2RsYzI2bCJ9.l7Ht-cO4Owt7vgiAY3lwsQ')
     px.set_mapbox_access_token('pk.eyJ1IjoibXN1YXJlejkiLCJhIjoiY2ttZ3F1cjZ0MDAxMjJubW5tN2RsYzI2bCJ9.l7Ht-cO4Owt7vgiAY3lwsQ')
-    fig = px.scatter_mapbox(
-        data_frame = dff, #[df['Clinic Access']==value],
-        lat = dff['Latitude'], 
-        lon = dff['Longitude'],
-        color = dff[selected_feature],
-        #color_discrete_map={'Y':'green','N':'red','':'gray'},
-        hover_name="Community (Clean)",
-        hover_data={'Latitude':False,'Longitude':False},
-        zoom = 13
-    )
+    
+    
+    if selected_option == []:
+        dff = df[df['City (Clean)']==selected_city]
+        avg_lat = mean(dff['Latitude'])
+        avg_lon = mean(dff['Longitude'])
+
+        fig = px.scatter_mapbox(
+            data_frame = dff, #[df['Clinic Access']==value],
+            lat = dff['Latitude'], 
+            lon = dff['Longitude'],
+            zoom = 13,
+            hover_data={'Latitude':False,'Longitude':False},
+        )
+        fig.update_traces(marker_opacity=0)
+
+    else:
+        dff = df[df[selected_feature].isin(selected_option)]
+        dff = dff[dff['City (Clean)']==selected_city]
+        avg_lat = mean(dff['Latitude'])
+        avg_lon = mean(dff['Longitude'])
+
+        #dff = df[df['Roof Condition'].isin(value)]
+    
+        fig = px.scatter_mapbox(
+            data_frame = dff, #[df['Clinic Access']==value],
+            lat = dff['Latitude'], 
+            lon = dff['Longitude'],
+            color = dff[selected_feature],
+            #color_discrete_map={'Y':'green','N':'red','':'gray'},
+            hover_name="Community (Clean)",
+            hover_data={'Latitude':False,'Longitude':False},
+            zoom = 13
+        )
 
 
     fig.update_layout(
@@ -142,8 +164,8 @@ def set_display_children(selected_feature, selected_option,selected_city):
         geo_scope='world',
             geo = dict(
             projection_scale=1000000, #this is kind of like zoom
-            center=dict(lat = mean(dff['Latitude']),lon=mean(dff['Longitude'])) # this will center on the point
-    ))
+            center=dict(lat = avg_lat,lon=avg_lon)) # this will center on the point
+    )
     fig.update_traces(hoverinfo='lon')
     fig.update_layout(mapbox_style="mapbox://styles/msuarez9/ckmp4rt7e0qf517o1md18w9d1")
     fig.update_layout(
