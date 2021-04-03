@@ -1,8 +1,9 @@
 from datetime import timedelta, date
 
+
 def calculate_age(born):
     if "-" in born:
-        mod = born.split('-')
+        mod = born.split("-")
         today = date.today()
         return int(today.year - int(mod[0]))
     elif "/" in born:
@@ -11,6 +12,6 @@ def calculate_age(born):
         try:
             return int(today.year - int(mod[2]))
         except:
-            return None 
-    else:   
+            return None
+    else:
         return None

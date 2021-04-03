@@ -1,11 +1,11 @@
 # map
 This project is an interactive map of all issues catalogued in our map app
 
-## Build 
+## Build
 **Install virtual environment library**
 ```bash
 cd <PROJECT_FOLDER_NAME>/
-pip install virtualenv #if you don't have virtualenv installed 
+pip install virtualenv #if you don't have virtualenv installed
 ```
 
 **Create virtualenv**
@@ -33,4 +33,10 @@ pip install -r requirements.txt
 Run python script in root directory of your project to start
 ```
 python main.py
+```
+
+
+Linter
+```bash
+pre-commit run --all-files
 ```
