@@ -8,8 +8,8 @@ import pandas as pd
 import math
 import difflib
 #Files 
-survey_json = "Data\SurveyDataMarch3.json"
-environmental_json = "Data\HistoryEnvironmentalHealthMarch3.json"
+survey_json = "data/SurveyDataMarch3.json"
+environmental_json = "data/HistoryEnvironmentalHealthMarch3.json"
 
 def clean_data():
     #Open Files 
@@ -243,7 +243,7 @@ def clean_data():
         df = df.rename(columns={map_columns[i]:rename_columns[i]})
 
 # Clean Community Names w scott data
-    excel_clean = pd.read_excel("Data\Puente Dashboard 2-24-21.xlsx",sheet_name="Environmental Data")
+    excel_clean = pd.read_excel("data/Puente Dashboard 2-24-21.xlsx",sheet_name="Environmental Data")
 
     #List of clean city and community names
     clean_community_names = excel_clean['Community (Clean)'].unique()
