@@ -19,6 +19,9 @@ from data_cleaning import script, maindataclean
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+server = app.server
+
 df = maindataclean.clean_data()
 df = df.dropna()
 
@@ -44,8 +47,6 @@ all_options = {
     "Roof Condition": ["Adequate", "Needs Repair"],
     "Latrine or Bathroom Access": ["Yes", "No"],
 }
-
-# import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700&display=swap')
 
 app.layout = html.Div(
     [
@@ -141,26 +142,6 @@ app.layout = html.Div(
     ],
     style={"top": "1", "left": "0"},
 )
-# app.css.config.serve_locally = True
-# app.scripts.config.serve_locally = True
-
-# external_css = [
-#     "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css",
-#     "//fonts.googleapis.com/css?family=Roboto|Lato",
-#     'https://codepen.io/chriddyp/pen/bWLwgP.css',
-# ]
-
-# for css in external_css:
-#     app.css.append_css({"external_url": css})
-
-# @import {}
-# @font-face {
-#   font-family: 'Roboto';
-#   font-style: normal;
-#   font-weight: 400;
-#   src: local('Roboto'), local('Roboto-Regular'), url(https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2) format('woff2');
-#   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-# }
 
 
 @app.callback(
