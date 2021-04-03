@@ -13,7 +13,7 @@ pip install virtualenv #if you don't have virtualenv installed
 virtualenv <NAME_OF_VIRTUAL_ENVIRONMENT> #i.e. venv
 ```
 ***NOTE***
-_The current latest version of numpy only supports up to Python 3.7. If you have any version of Python that's later, you'll have to install a Python 3.7 specific environment like so:_
+_The current latest version of numpy only supports up to Python 3.6. If you have any version of Python that's later, you'll have to install a Python 3.7 specific environment like so:_
 
 ```bash
 virtualenv -p python3.7 <NAME_OF_VIRTUAL_ENVIRONMENT>
