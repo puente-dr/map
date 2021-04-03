@@ -304,7 +304,7 @@ def map_formatting(survey_df, environmental_df):
     for i in np.arange(len(map_columns)):
         df = df.rename(columns={map_columns[i]:rename_columns[i]})
 
-# Clean Community Names w scott data
+    # Clean Community Names w scott data
     excel_clean = pd.read_excel('Puente Dashboard 2-24-21.xlsx',sheet_name="Environmental Data")
 
     #List of clean city and community names
