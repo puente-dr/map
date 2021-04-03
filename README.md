@@ -34,9 +34,8 @@ Run python script in root directory of your project to start
 ```
 python main.py
 ```
-
-
-Linter
+## Commands
+### Linter
 ```bash
 pre-commit run --all-files
 ```
