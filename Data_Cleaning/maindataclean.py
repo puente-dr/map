@@ -8,8 +8,8 @@ import pandas as pd
 import math
 import difflib
 #Files 
-survey_json = "Data\SurveyDataMarch3.json"
-environmental_json = "Data\HistoryEnvironmentalHealthMarch3.json"
+survey_json = "data\surveydatamarch3.json"
+environmental_json = "data\historyenvironmentalhealthmarch3.json"
 
 def clean_data():
     #Open Files 
@@ -47,14 +47,20 @@ def clean_data():
             return None
 
     #Calculate age column
+    
+    #replace on 'dob' column
     survey_df = survey_df.replace({np.nan: ''})
     survey_df['age'] = survey_df['dob'].apply(calculate_age)
 
     #Clean Environmental Dataframe
+    
+    #replacae on entire environmental_df 
     environmental_df = environmental_df.replace({np.nan: ''})
     environmental_df = environmental_df.drop_duplicates(subset=['client.objectId'])
 
     #Make all empty strings NAN
+
+    #replace for entire dataframe: survey_df and environmental_df
     survey_df_nulls = survey_df.replace({'':np.nan})
     environmental_df_nulls = environmental_df.replace({'':np.nan})
 
@@ -63,27 +69,31 @@ def clean_data():
     ## Fix typos, create new classifications
 
     # Replace 'widow\n' with 'widow'
-    survey_df = survey_df.replace('widow\n', 'widow', regex=True)
+    # survey_df = survey_df.replace('widow\n', 'widow', regex=True)
     
-    #Replace Relationship "null,null" with ""
-    survey_df["relationship"]= survey_df["relationship"].replace("null, null", "") 
+    # #Replace Relationship "null,null" with ""
+    # survey_df["relationship"]= survey_df["relationship"].replace("null, null", "") 
 
-    # Replace 'breastancler' with 'breastcancer'
-    survey_df = survey_df.replace('breastcancler', 'breastcancer', regex=True)
+    # # Replace 'breastancler' with 'breastcancer'
+    # survey_df = survey_df.replace('breastcancler', 'breastcancer', regex=True)
 
     # Replace 'lessThanprimary\n' with 'lessThanprimary'
+    #replace for column 'educationLevel'
     survey_df = survey_df.replace('lessThanprimary\n', 'lessThanprimary', regex=True)
 
     # Replace 'moreThan10\n' with 'moreThan10'
-    survey_df = survey_df.replace('moreThan10\n', 'moreThan10', regex=True)
+    #replace for columns 'yearsLivedinthecommunity' and 'yearsLivedinThisHouse'
+    # survey_df = survey_df.replace('moreThan10\n', 'moreThan10', regex=True)
 
     # Replace underscores with hyphens for time ranges
-    environmental_df = environmental_df.replace('1_2', '1-2', regex=True)
-    environmental_df = environmental_df.replace('3_4', '3-4', regex=True)
-    environmental_df = environmental_df.replace('5_10', '5-10', regex=True)
+    #replace for columns 'yearsLivedinthecommunity' and 'yearsLivedinThisHouse'
+    # environmental_df = environmental_df.replace('1_2', '1-2', regex=True)
+    # environmental_df = environmental_df.replace('3_4', '3-4', regex=True)
+    # environmental_df = environmental_df.replace('5_10', '5-10', regex=True)
 
     # Re-classify flooring conditions 
     # dirtPoor = poor, cementPoor/dirtWorking = working, cementWorking =good
+    # replace for column 'conditionoFloorinyourhouse'
     environmental_df = environmental_df.replace('dirtPoor', 'poor', regex=True)
     environmental_df = environmental_df.replace('cementPoor', 'working', regex=True)
     environmental_df = environmental_df.replace('dirtWorking', 'working', regex=True)
@@ -91,6 +101,7 @@ def clean_data():
 
     # Re-classify roofing conditions
     # bad = poor, normal = working
+    # replace for column 'conditionoRoofinyourhouse'
     roofing_options = ['poor','working','great'] #Currently not an option for great. Crismary said that ideally these three categories would be beneficial 
     environmental_df = environmental_df.replace('bad', 'poor', regex=True)
     environmental_df = environmental_df.replace('normal', 'working', regex=True)
@@ -98,70 +109,70 @@ def clean_data():
 
     # Clean numberofIndividualsLivingintheHouse
 
-    #Make all lowercase
-    environmental_df["numberofIndividualsLivingintheHouse"] = environmental_df["numberofIndividualsLivingintheHouse"].str.lower()
+    # #Make all lowercase
+    # environmental_df["numberofIndividualsLivingintheHouse"] = environmental_df["numberofIndividualsLivingintheHouse"].str.lower()
 
-    # Extract only numbers
-    environmental_df['numberofIndividualsLivingintheHouseDigits']=environmental_df.numberofIndividualsLivingintheHouse.str.extract('(\d+)')
+    # # Extract only numbers
+    # environmental_df['numberofIndividualsLivingintheHouseDigits']=environmental_df.numberofIndividualsLivingintheHouse.str.extract('(\d+)')
 
-    # Merge Columns
-    environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].isnull(),'numberofIndividualsLivingintheHouseDigits'] = environmental_df['numberofIndividualsLivingintheHouse']
+    # # Merge Columns
+    # environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].isnull(),'numberofIndividualsLivingintheHouseDigits'] = environmental_df['numberofIndividualsLivingintheHouse']
 
 
     # Number spellings
-    one_spellings = ['una','uno']
-    two_spellings = ['dos']
-    three_spellings = ['tres','trres']
-    four_spellings = ['cuatro','cuatros']
+    # one_spellings = ['una','uno']
+    # two_spellings = ['dos']
+    # three_spellings = ['tres','trres']
+    # four_spellings = ['cuatro','cuatros']
 
-    for one in one_spellings:
-        environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].str.contains(one), 'numberofIndividualsLivingintheHouseDigits'] = '1'
-    for two in two_spellings:
-        environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].str.contains(two), 'numberofIndividualsLivingintheHouseDigits'] = '2'
-    for three in three_spellings:
-        environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].str.contains(three), 'numberofIndividualsLivingintheHouseDigits'] = '3'
-    for four in four_spellings:
-        environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].str.contains(four), 'numberofIndividualsLivingintheHouseDigits'] = '4'
+    # for one in one_spellings:
+    #     environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].str.contains(one), 'numberofIndividualsLivingintheHouseDigits'] = '1'
+    # for two in two_spellings:
+    #     environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].str.contains(two), 'numberofIndividualsLivingintheHouseDigits'] = '2'
+    # for three in three_spellings:
+    #     environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].str.contains(three), 'numberofIndividualsLivingintheHouseDigits'] = '3'
+    # for four in four_spellings:
+    #     environmental_df.loc[environmental_df['numberofIndividualsLivingintheHouseDigits'].str.contains(four), 'numberofIndividualsLivingintheHouseDigits'] = '4'
 
-    # Final clean to ensure just number results
-    environmental_df['numberofIndividualsLivingintheHouseDigits'] = environmental_df['numberofIndividualsLivingintheHouseDigits'].str.extract('(^(0|[1-9][0-9]{0,1})$)', expand=False)
+    # # Final clean to ensure just number results
+    # environmental_df['numberofIndividualsLivingintheHouseDigits'] = environmental_df['numberofIndividualsLivingintheHouseDigits'].str.extract('(^(0|[1-9][0-9]{0,1})$)', expand=False)
 
-    # Filter to remove leading 0s 
-    environmental_df['numberofIndividualsLivingintheHouseDigits'] = environmental_df['numberofIndividualsLivingintheHouseDigits'].astype(float) 
+    # # Filter to remove leading 0s 
+    # environmental_df['numberofIndividualsLivingintheHouseDigits'] = environmental_df['numberofIndividualsLivingintheHouseDigits'].astype(float) 
 
-    # Filter to remove non-possible values
-    environmental_df.loc[(environmental_df.numberofIndividualsLivingintheHouseDigits > 20),'numberofIndividualsLivingintheHouseDigits']= np.nan
+    # # Filter to remove non-possible values
+    # environmental_df.loc[(environmental_df.numberofIndividualsLivingintheHouseDigits > 20),'numberofIndividualsLivingintheHouseDigits']= np.nan
 
 
-    # Clean City Names
-    def f(x):
-        try:
-            return difflib.get_close_matches(x["city"],city_names)[0]
-        except:
-            return ''
+    # # Clean City Names
+    # def f(x):
+    #     try:
+    #         return difflib.get_close_matches(x["city"],city_names)[0]
+    #     except:
+    #         return ''
 
-    # Cities Identified 
-    city_names = ['tireo','spm','adansi','consuelo','constanza','la romana','ciudad de dios', 'la vega','santo domingo','asokwa','santiago','santa fe','san pedro de macorís','el seibo']
+    # # Cities Identified 
+    # city_names = ['tireo','spm','adansi','consuelo','constanza','la romana','ciudad de dios', 'la vega','santo domingo','asokwa','santiago','santa fe','san pedro de macorís','el seibo']
 
-    # Make all lowercase
-    survey_df['city'] = survey_df['city'].str.lower()
+    # # Make all lowercase
+    # survey_df['city'] = survey_df['city'].str.lower()
 
-    # Apply function
-    survey_df["city_match"] = survey_df.apply(f, axis=1)
-    survey_df["city_match"] = survey_df["city_match"].replace('spm', 'San Pedro de Macorís', regex=True)
+    # # Apply function
+    # survey_df["city_match"] = survey_df.apply(f, axis=1)
+    # survey_df["city_match"] = survey_df["city_match"].replace('spm', 'San Pedro de Macorís', regex=True)
 
-    #houseownership
+    #replace for column 'houseownership'
     environmental_df['houseownership'] = environmental_df['houseownership'].replace('owned', 'Y', regex=True)
     environmental_df['houseownership'] = environmental_df['houseownership'].replace('rented', 'N', regex=True)
 
-    #latrineAccess and clinicAccess and bathroomAccess
+    #replace for columns 'latrineAccess', 'clinicAccess', and 'bathroomAccess'
     environmental_df = environmental_df.replace('No', 'N', regex=True)
     environmental_df = environmental_df.replace('Yes', 'Y', regex=True)
 
     #sex
     survey_df['sex'] = survey_df['sex'].str.lower()
 
-    # dob and age (some are negative or too big)
+    #dob and age (some are negative or too big)
     dob_max = datetime.today().date()
     dob_min = dob_max.replace(year=dob_max.year - 115)
     survey_df[pd.to_numeric(survey_df['age']) < 0] = ''
@@ -173,6 +184,7 @@ def clean_data():
     full_df = full_df.drop_duplicates(subset=['client.objectId'])
     full_df = full_df.drop(columns = ['client.objectId','objectId_y'])
     full_df = full_df.rename(columns={"objectId_x": "objectId"})
+    #replace for entire df full_df
     full_df = full_df.replace({np.nan: ''})
     df = full_df
     
@@ -181,11 +193,12 @@ def clean_data():
     df.loc[(df['latrineAccess'] == 'N') & (df['bathroomAccess'] == 'N'), 'Latrine or Bathroom Access'] = 'No'  
 
     # Change numbers to digits without decimals for numerical columns
+    #replace for column 'age'
     df['age'] = df['age'].replace('',np.nan)
     df['age'] = df['age'].astype('float').astype('Int64')
 
-    df['numberofIndividualsLivingintheHouseDigits'] = df['numberofIndividualsLivingintheHouseDigits'].replace('',np.nan)
-    df['numberofIndividualsLivingintheHouseDigits'] = df['numberofIndividualsLivingintheHouseDigits'].astype(str).astype('float').astype('Int64')
+    # df['numberofIndividualsLivingintheHouseDigits'] = df['numberofIndividualsLivingintheHouseDigits'].replace('',np.nan)
+    # df['numberofIndividualsLivingintheHouseDigits'] = df['numberofIndividualsLivingintheHouseDigits'].astype(str).astype('float').astype('Int64')
 
 
     # Relabeing values in df for mapping purposes
@@ -197,7 +210,7 @@ def clean_data():
     waterAccess_vals_new = ['' ,'2-3x A Week' ,'4-6x A Week', '1x A Month', 'Never', '1x A Week', 'Every day']
 
     conditionoFloorinyourhouse_vals = ['', 'good', 'poor', 'working']
-    conditionoFloorinyourhouse_vals_new = ['', 'Great', 'Needs Repair', 'Adequate'] #reconsider great
+    conditionoFloorinyourhouse_vals_new = ['', 'Good', 'Needs Repair', 'Adequate'] #reconsider great
 
     conditionoRoofinyourhouse_vals = ['', 'working', 'poor']
     conditionoRoofinyourhouse_vals_new = ['', 'Adequate', 'Needs Repair']
@@ -231,19 +244,20 @@ def clean_data():
     for i in np.arange(len(map_columns_tochange)):
         for x in np.arange(len(all_vals)):
             for x_len in np.arange(len(all_vals[x])):
+                #replace for correpsonding columns
                 df[map_columns_tochange[i]] = df[map_columns_tochange[i]].replace(all_vals[x][x_len],all_vals_new[x][x_len])
 
     # Rename columnn names for mapping. Also Filter out to only include necessary columns
 
-    map_columns = ['objectId', 'educationLevel', 'latitude', 'longitude', 'age', 'communityname','city','city_match', 'waterAccess', 'clinicAccess', 'conditionoFloorinyourhouse', 'conditionoRoofinyourhouse',  'stoveType', 'houseMaterial', 'electricityAccess', 'foodSecurity', 'govAssistance', 'numberofIndividualsLivingintheHouseDigits','Latrine or Bathroom Access']
-    rename_columns = ['objectId', 'Education Level', 'Latitude', 'Longitude', 'Age','Community','City', 'City NLP Match', 'Water Access', 'Clinic Access', 'Floor Condition', 'Roof Condition', 'Stove Ventilation', 'House Material', 'Electricity Access','Food Security', 'Government Assistance', 'Number of People in the House', 'Latrine or Bathroom Access']
+    map_columns = ['objectId', 'educationLevel', 'latitude', 'longitude', 'age', 'communityname','city', 'waterAccess', 'clinicAccess', 'conditionoFloorinyourhouse', 'conditionoRoofinyourhouse',  'stoveType', 'houseMaterial', 'electricityAccess', 'foodSecurity', 'govAssistance','Latrine or Bathroom Access']
+    rename_columns = ['objectId', 'Education Level', 'Latitude', 'Longitude', 'Age','Community','City', 'Water Access', 'Clinic Access', 'Floor Condition', 'Roof Condition', 'Stove Ventilation', 'House Material', 'Electricity Access','Food Security', 'Government Assistance', 'Latrine or Bathroom Access']
 
     df = df[df.columns[df.columns.isin(map_columns)]]
     for i in np.arange(len(map_columns)):
         df = df.rename(columns={map_columns[i]:rename_columns[i]})
 
 # Clean Community Names w scott data
-    excel_clean = pd.read_excel("Data\Puente Dashboard 2-24-21.xlsx",sheet_name="Environmental Data")
+    excel_clean = pd.read_excel("data\puentedashboard2-24-21.xlsx",sheet_name="Environmental Data")
 
     #List of clean city and community names
     clean_community_names = excel_clean['Community (Clean)'].unique()

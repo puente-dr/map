@@ -14,8 +14,8 @@ from mapboxgl.viz import *
 import numpy as np
 import pandas as pd
 from statistics import *
-from Data_Cleaning import script
-from Data_Cleaning import maindataclean
+from data_cleaning import script
+from data_cleaning import maindataclean
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -28,7 +28,7 @@ all_options = {
  'Completed High School', 'Some High School',  'Some College'],
     'Water Access': ['2-3x A Week', '4-6x A Week', '1x A Month', 'Never', '1x A Week', 'Every day'],
     'Clinic Access':['Yes', 'No'],
-    'Floor Condition':['Great', 'Needs Repair', 'Adequate'],
+    'Floor Condition':['Good', 'Needs Repair', 'Adequate'],
     'Roof Condition':['Adequate', 'Needs Repair'],
     'Latrine or Bathroom Access':['Yes','No']
 }
@@ -132,7 +132,7 @@ def set_display_children(selected_feature, selected_option,selected_city):
             lat = dff['Latitude'], 
             lon = dff['Longitude'],
             zoom = 13,
-            hover_data={'Latitude':False,'Longitude':False},
+            hover_data={'Education Level':True,'Water Access':True,'Clinic Access':True,'Floor Condition':True,'Roof Condition':True,'Latrine or Bathroom Access':True,'Longitude':False,'Latitude':False},
         )
         fig.update_traces(marker_opacity=0)
 
@@ -151,7 +151,7 @@ def set_display_children(selected_feature, selected_option,selected_city):
             color = dff[selected_feature],
             #color_discrete_map={'Y':'green','N':'red','':'gray'},
             hover_name="Community (Clean)",
-            hover_data={'Latitude':False,'Longitude':False},
+            hover_data={'Education Level':True,'Water Access':True,'Clinic Access':True,'Floor Condition':True,'Roof Condition':True,'Latrine or Bathroom Access':True,'Longitude':False,'Latitude':False},
             zoom = 13
         )
 
