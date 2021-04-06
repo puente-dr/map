@@ -43,7 +43,7 @@ all_options = {
         "Every day",
     ],
     "Clinic Access": ["Yes", "No"],
-    "Floor Condition": ["Great", "Needs Repair", "Adequate"],
+    "Floor Condition": ["Good", "Needs Repair", "Adequate"],
     "Roof Condition": ["Adequate", "Needs Repair"],
     "Latrine or Bathroom Access": ["Yes", "No"],
 }
@@ -201,7 +201,7 @@ def set_display_children(selected_feature, selected_option, selected_city):
             color=dff[selected_feature],
             # color_discrete_map={'Y':'green','N':'red','':'gray'},
             hover_name="Community (Clean)",
-            hover_data={"Latitude": False, "Longitude": False},
+            hover_data={'Education Level':True,'Water Access':True,'Clinic Access':True,'Floor Condition':True,'Roof Condition':True,'Latrine or Bathroom Access':True,'Longitude':False,'Latitude':False},
             zoom=13,
         )
 
