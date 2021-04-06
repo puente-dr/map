@@ -1,0 +1,28 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: .cache/pre-commit
+        name: install python3 requirements
+        entry: pip3 install -r requirements.txt
+        language: python
+        'types': [python]
+        pass_filenames: false
+        stages: [commit]
+    # -   id: unittest
+    #     name: execute unit test
+    #     entry: python3 -m unittest
+    #     language: python
+    #     'types': [python]
+    #     pass_filenames: false
+    #     stages: [commit]
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: requirements-txt-fixer
+-   repo: https://github.com/psf/black
+    rev: 19.3b0
+    hooks:
+    -   id: black
