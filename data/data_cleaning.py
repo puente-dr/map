@@ -223,11 +223,11 @@ def clean_api_code():
     # Make all lowercase
     survey_df["city"] = survey_df["city"].str.lower()
 
-    # Apply function
-    survey_df["city_match"] = survey_df.apply(f, axis=1)
-    survey_df["city_match"] = survey_df["city_match"].replace(
-        "spm", "San Pedro de Macorís", regex=True
-    )
+    # # Apply function
+    # survey_df["city_match"] = survey_df.apply(f, axis=1)
+    # survey_df["city_match"] = survey_df["city_match"].replace(
+    #     "spm", "San Pedro de Macorís", regex=True
+    # )
 
     # Finding city names for the list
     # pd.set_option('display.max_rows', 400)
@@ -310,15 +310,15 @@ def clean_api_code():
 
     # Individuals living in the hosue
 
-    df["numberofIndividualsLivingintheHouseDigits"] = df[
-        "numberofIndividualsLivingintheHouseDigits"
-    ].replace("", np.nan)
-    df["numberofIndividualsLivingintheHouseDigits"] = (
-        df["numberofIndividualsLivingintheHouseDigits"]
-        .astype(str)
-        .astype("float")
-        .astype("Int64")
-    )
+    # df["numberofIndividualsLivingintheHouseDigits"] = df[
+    #     "numberofIndividualsLivingintheHouseDigits"
+    # ].replace("", np.nan)
+    # df["numberofIndividualsLivingintheHouseDigits"] = (
+    #     df["numberofIndividualsLivingintheHouseDigits"]
+    #     .astype(str)
+    #     .astype("float")
+    #     .astype("Int64")
+    # )
 
     # Relabeing values in df
 
@@ -469,7 +469,6 @@ def clean_api_code():
         "age",
         "communityname",
         "city",
-        "city_match",
         "waterAccess",
         "clinicAccess",
         "conditionoFloorinyourhouse",
@@ -479,7 +478,6 @@ def clean_api_code():
         "electricityAccess",
         "foodSecurity",
         "govAssistance",
-        "numberofIndividualsLivingintheHouseDigits",
         "Latrine or Bathroom Access",
     ]
 
@@ -491,7 +489,6 @@ def clean_api_code():
         "Age",
         "Community",
         "City",
-        "City NLP Match",
         "Water Access",
         "Clinic Access",
         "Floor Condition",
@@ -501,7 +498,6 @@ def clean_api_code():
         "Electricity Access",
         "Food Security",
         "Government Assistance",
-        "Number of People in the House",
         "Latrine or Bathroom Access",
     ]
 
