@@ -231,11 +231,11 @@ def clean_data():
     # Make all lowercase
     survey_df["city"] = survey_df["city"].str.lower()
 
-    # # Apply function
-    # survey_df["city_match"] = survey_df.apply(f, axis=1)
-    # survey_df["city_match"] = survey_df["city_match"].replace(
-    #     "spm", "San Pedro de Macorís", regex=True
-    # )
+    # Apply function
+    survey_df["city_match"] = survey_df.apply(f, axis=1)
+    survey_df["city_match"] = survey_df["city_match"].replace(
+        "spm", "San Pedro de Macorís", regex=True
+    )
 
     # houseownership
     # replace in column 'houseownership'
@@ -249,6 +249,10 @@ def clean_data():
     # replace for columns: 'latrineAccess' and 'clinicAccess' and 'bathroomAccess'
     environmental_df = environmental_df.replace("N", "No", regex=True)
     environmental_df = environmental_df.replace("Y", "Yes", regex=True)
+
+    #Replaces mispelled yes and no for latrineAccess and bathroomAccess columns
+    environmental_df = environmental_df.replace("Yeses", "Yes", regex=True)
+    environmental_df = environmental_df.replace("Noo", "No", regex=True)
 
     # sex
     survey_df["sex"] = survey_df["sex"].str.lower()
@@ -275,11 +279,11 @@ def clean_data():
 
     # Create new columns for latrine or bathroom access
     df.loc[
-        (df["latrineAccess"] == "Y") | (df["bathroomAccess"] == "Y"),
+        (df["latrineAccess"] == "Yes") | (df["bathroomAccess"] == "Yes"),
         "Latrine or Bathroom Access",
     ] = "Yes"
     df.loc[
-        (df["latrineAccess"] == "N") & (df["bathroomAccess"] == "N"),
+        (df["latrineAccess"] == "No") & (df["bathroomAccess"] == "No"),
         "Latrine or Bathroom Access",
     ] = "No"
 
@@ -485,10 +489,9 @@ def clean_data():
     excel_clean = pd.read_excel(
         "data/Puente Dashboard 2-24-21.xlsx", sheet_name="Environmental Data"
     )
-
     # List of clean city and community names
-    clean_community_names = excel_clean["Community (Clean)"].unique()
-    clean_city_names = excel_clean["City (Clean)"].unique()
+    clean_community_names = sorted(excel_clean["Community (Clean)"].dropna().unique().tolist())
+    clean_city_names = sorted(excel_clean["City (Clean)"].dropna().unique().tolist())
 
     # Get clean community and clean city names into individual dataframes
     clean_community = excel_clean[
@@ -508,7 +511,11 @@ def clean_data():
         cleandf1, clean_city, left_on=["City"], right_on=["city"], how="left"
     )
 
-    cleandf3 = cleandf2.drop(columns=["city", "communityname"])
+    # Drop non-clean columns and ensure that data is tied to a city and a community. Also rename columns
+    cleandf3 = cleandf2.drop(columns=["city", "City","Community","communityname",])
+    cleandf3 = cleandf3.rename(columns={"Community (Clean)":"Community", "City (Clean)": "City"})
+    cleandf3 = cleandf3[cleandf3['Community'].notna()]
+    cleandf3 = cleandf3[cleandf3['City'].notna()]
 
     # Ensure that data has geographic coordinates
     cleandf4 = cleandf3[cleandf3["Latitude"] != ""]
@@ -527,4 +534,4 @@ def clean_data():
     df = cleandf4
     # Calculate Missings
     # df = df.replace(np.nan,'')
-    return df
+    return df, clean_community_names, clean_city_names
