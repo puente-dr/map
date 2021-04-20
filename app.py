@@ -14,7 +14,7 @@ from mapboxgl.viz import *
 import numpy as np
 import pandas as pd
 from statistics import *
-from data_cleaning import script, maindatacleanscript
+from data_cleaning import script, maindataclean
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
@@ -22,7 +22,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 
-df = maindatacleanscript.clean_data()
+df = maindataclean.clean_data()
 
 #Remove Tireo bc no information on it in the current data frame
 city_names = sorted(df["City"].dropna().unique().tolist())

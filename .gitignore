@@ -7,8 +7,8 @@ __pycache__/
 *.so
 
 #Virtual environments
-testvenv4/
 mapvenv/
+testvenv4/
 
 #Old Scratch Files
 Scratch/
