@@ -14,7 +14,7 @@ from mapboxgl.viz import *
 import numpy as np
 import pandas as pd
 from statistics import *
-from data_cleaning import script, maindatacleanscript
+from data_cleaning import script, maindataclean
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
@@ -22,39 +22,26 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 
-df = maindatacleanscript.clean_data()
+df, community_names, city_names = maindataclean.clean_data()
 
-#Remove Tireo bc no information on it in the current data frame
-city_names = sorted(df["City"].dropna().unique().tolist())
-#city_names.remove('Tireo')
 
-# Community names for map
-community_focus = ['Los Gajitos', 'El Canal', 'Cañada las Palmas', 'El Convento', 'Los Embassadores', 'Los Mangos','Cuidad de Dios']
-community_names = community_focus
-df = df[df['Community'].isin(community_focus)]
-
-# Map
 all_location_options = {"City":city_names,"Community":community_names}
+
+
 all_health_options = {
     "Clinic Access": ["Yes", "No"],
     "Water Access": [
-        "Every day",
-        "4-6x A Week",
         "2-3x A Week",
-        "1x A Week",
+        "4-6x A Week",
         "1x A Month",
         "Never",
+        "1x A Week",
+        "Every day",
     ],
-    "Floor Condition": ["Good",  "Adequate","Needs Repair"],
+    "Floor Condition": ["Good", "Needs Repair", "Adequate"],
     "Roof Condition": ["Adequate", "Needs Repair"],
     "Latrine or Bathroom Access": ["Yes", "No"],
 }
-
-color_map = {"Clinic Access":{'Yes':'#016930','No':'#03CA5D'},
-    "Water Access":{"Every day":'#013856',"4-6x A Week":'#016ca0',"2-3x A Week":'#0099dc',"1x A Week":'#85e8ff', "1x A Month":'#cef6fe',"Never":'#f3fdff'},
-    "Floor Condition": {"Good":'#23015B',  "Adequate":'#9E63FF',"Needs Repair":'#CFB2FE'},
-    "Roof Condition": {"Adequate":'#dd8b01', "Needs Repair":'#fdc475'},
-    "Latrine or Bathroom Access":{'Yes':'#740702','No':'#f78a78'}}
 
 app.layout = html.Div(
     [
@@ -65,19 +52,16 @@ app.layout = html.Div(
                         id="display-selected-values",
                         figure={},
                         style={
-                            "display":"block",
                             "top": "0",
                             "left": "0",
                             "position": "fixed",
                             "width": "75%",
-                            "height":"100%"
                         },
                     ),
-                style={"background-color":"#f8f7f6"}
                 ),
                 #html.Div(id='dd-output-container'),
             ],
-            style={"background-color":"#f8f7f6","width": "100%", "display": "table", "top": "0", "left": "0"},
+            style={"width": "100%", "display": "table", "top": "0", "left": "0"},
         ),
         html.Div(
             [
@@ -115,7 +99,7 @@ app.layout = html.Div(
                     ],
                     style={"width": "100%"},
                 ),
-                html.Hr(style={"margin-top": "20px","margin-bottom":"20px"}),
+                html.Hr(),
                 html.Div(
                     [
                         html.Div(html.Label("Household Features"),style={"font-family": "Roboto","font-weight":"bold"}),
@@ -154,8 +138,8 @@ app.layout = html.Div(
                     style={"width": "100%"},
                     className="custom-dropdown",
                 ),
-                html.Hr(style={"margin-top": "20px","margin-bottom":"20px"}),
-                html.Div(id='dd-output-container',style={"font-family": "Roboto","font-size":"20px"}),
+                html.Hr(),
+                html.Div(id='dd-output-container'),
             ],
             style={
                 "width": "25%",
@@ -164,11 +148,10 @@ app.layout = html.Div(
                 "right": "0",
                 "display": "table",
                 'padding':'40px',
-                'background-color':"#f8f7f6"
             },
         ),
     ],
-    style={"background-color":"#f8f7f6","top": "1", "left": "0"},
+    style={"top": "1", "left": "0"},
 )
 
 @app.callback(
@@ -256,60 +239,43 @@ def set_display_children(location_selected_feature, location_selected_option,hea
         "pk.eyJ1IjoibXN1YXJlejkiLCJhIjoiY2ttZ3F1cjZ0MDAxMjJubW5tN2RsYzI2bCJ9.l7Ht-cO4Owt7vgiAY3lwsQ"
     )
 
-    dff = df[df[location_selected_feature]==location_selected_option]
-    avg_lat = mean(dff["Latitude"])
-    avg_lon = mean(dff["Longitude"])
+    if health_selected_option == [] or len(df[df[health_selected_feature].isin(health_selected_option)])==0:
+        dff = df[df[location_selected_feature]==location_selected_option]
+        avg_lat = mean(dff["Latitude"])
+        avg_lon = mean(dff["Longitude"])
 
-    if health_selected_option == [] or len(dff[dff[health_selected_feature].isin(health_selected_option)])==0:
         fig = px.scatter_mapbox(
-            bgcolor = '#f8f7f6',
             data_frame=dff,  # [df['Clinic Access']==value],
             lat=dff["Latitude"],
             lon=dff["Longitude"],
-            zoom=15,
+            zoom=13,
             hover_data={'Water Access':False,'Clinic Access':False,'Floor Condition':False,'Roof Condition':False,'Latrine or Bathroom Access':False,'Longitude':False,'Latitude':False},
         )
         fig.update_traces(marker_opacity=0)
 
-
     else:
-        dff = dff[dff[health_selected_feature].isin(health_selected_option)]
-        lat_val=dff["Latitude"]
-        lon_val=dff["Longitude"]
+        dff = df[df[health_selected_feature].isin(health_selected_option)]
+        dff = dff[dff[location_selected_feature].isin([location_selected_option])]
+        avg_lat = mean(dff["Latitude"])
+        avg_lon = mean(dff["Longitude"])
+
+        # dff = df[df['Roof Condition'].isin(value)]
+
         fig = px.scatter_mapbox(
             data_frame=dff,  # [df['Clinic Access']==value],
             lat=dff["Latitude"],
             lon=dff["Longitude"],
             color=dff[health_selected_feature],
-            color_discrete_map=color_map[health_selected_feature],
+            # color_discrete_map={'Y':'green','N':'red','':'gray'},
             hover_name="Community",
+            # hover_data=
+            # "<b>%{'Community'} </b><br><br>" +
+            # "Water Access: %{'Water Access'}<br>" +
+            # "Clinic Access: %{'Clinic Access'}<br>",
             hover_data={'Water Access':True,'Clinic Access':True,'Floor Condition':True,'Roof Condition':True,'Latrine or Bathroom Access':True,'Longitude':False,'Latitude':False},
-            zoom=15,
-            opacity = 0.8,
-            category_orders={health_selected_feature: all_health_options[health_selected_feature]},
+            zoom=13,
             custom_data=['Community','Water Access','Clinic Access','Floor Condition','Roof Condition','Latrine or Bathroom Access']
         )
-        fig.update_traces(hoverinfo="lon", 
-        hovertemplate = "<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}" 
-        )
-        fig.update_traces(#ids='123test',
-        marker_size=15)
-        # fig.add_trace(go.Scattermapbox(
-        #     lat=lat_val,
-        #     lon=lon_val,
-        #     mode='markers',
-        #     marker=go.scattermapbox.Marker(color='grey',
-        #         #below='123test',
-        #         allowoverlap=False,
-        #         size=18,
-        #         opacity=0.4
-        #         ),
-        # hoverinfo='none',
-        # #coloraxis_showscale=False
-        # ))
-        fig.update_layout(hoverlabel=dict(bgcolor="white", font_size=16, font_family="Roboto"))
-
-
 
     fig.update_layout(
         autosize=True,
@@ -323,30 +289,21 @@ def set_display_children(location_selected_feature, location_selected_option,hea
             center=dict(lat=avg_lat, lon=avg_lon),
         ),  # this will center on the point
     )
-
+    fig.update_traces(hoverinfo="lon", 
+    hovertemplate = "<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}" 
+)
     fig.update_layout(mapbox_style="mapbox://styles/msuarez9/ckmp4rt7e0qf517o1md18w9d1")
     fig.update_layout(
-        legend_title = dict(
-            font = dict(
-                family ="Roboto", 
-                size = 20, 
-                color = "black"
-            )
-        ),
         legend=dict(
             font_family="Roboto",
-            font=dict(
-                family = "Roboto",
-                size=18,
-                color="black"
-            ),
             orientation="h",
             yanchor="bottom",
             xanchor="left",
-            y=-0.09,
+            y=-0.15,
             # width = '90%'
             # x=0
-        )    
+        ),
+        hoverlabel=dict(bgcolor="white", font_size=16, font_family="Roboto"),
     )
 
     return fig
