@@ -86,24 +86,16 @@ app.layout = html.Div(
                         id="display-selected-values",
                         figure={},
                         style={
-                            "display": "block",
-                            "top": "0",
-                            "left": "0",
-                            "position": "fixed",
-                            "width": "75%",
-                            "height": "100%",
+                            # This controls the Map Div
+                            "height": "800px"
                         },
-                    ),
-                    style={"background-color": "#f8f7f6"},
-                ),
-                # html.Div(id='dd-output-container'),
+                    )
+                )
             ],
             style={
+                # This controls the Map Container Div
                 "background-color": "#f8f7f6",
-                "width": "100%",
-                "display": "table",
-                "top": "0",
-                "left": "0",
+                "flex": "2 0 0",
             },
         ),
         html.Div(
@@ -127,8 +119,7 @@ app.layout = html.Div(
                                 )
                             ]
                         ),
-                    ],
-                    style={"width": "100%"},
+                    ]
                 ),
                 html.Div(
                     [
@@ -148,7 +139,6 @@ app.layout = html.Div(
                     ],
                     style={"width": "100%"},
                 ),
-                html.Hr(style={"margin-top": "20px", "margin-bottom": "20px"}),
                 html.Div(
                     [
                         html.Div(
@@ -193,24 +183,24 @@ app.layout = html.Div(
                     style={"width": "100%"},
                     className="custom-dropdown",
                 ),
-                html.Hr(style={"margin-top": "20px", "margin-bottom": "20px"}),
                 html.Div(
                     id="dd-output-container",
                     style={"font-family": "Roboto", "font-size": "20px"},
                 ),
             ],
             style={
-                "width": "25%",
-                "position": "fixed",
-                "top": "1",
-                "right": "0",
-                "display": "table",
-                "padding": "40px",
+                # This controls the Features Table Div
                 "background-color": "#f8f7f6",
+                "flex": "1 0 0",
             },
         ),
     ],
-    style={"background-color": "#f8f7f6", "top": "1", "left": "0"},
+    style={
+        # This controls the Div for the Entire Visualization
+        "display": "flex",
+        "flex-direction": "row",
+        "background-color": "#f8f7f6",
+    },
 )
 
 
@@ -399,10 +389,10 @@ def set_display_children(
                 "Latrine or Bathroom Access",
             ],
         )
-        fig.update_traces(
-            hoverinfo="lon",
-            hovertemplate="<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}",
-        )
+        # fig.update_traces(
+        #     hoverinfo="lon",
+        #     hovertemplate="<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}",
+        # )
         fig.update_traces(marker_size=15)  # ids='123test',
         # fig.add_trace(go.Scattermapbox(
         #     lat=lat_val,
