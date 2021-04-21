@@ -11,8 +11,8 @@ environmental_json = "data/HistoryEnvironmentalHealthMarch3.json"
 
 
 def clean_data():
-    #Open Files 
-    with open(survey_json,encoding="utf8") as file:
+    # Open Files
+    with open(survey_json, encoding="utf8") as file:
         data = json.load(file)
     survey_df = pd.json_normalize(data["results"])
 
@@ -72,18 +72,28 @@ def clean_data():
             return None
 
     # Calculate age column
-    #replace on column: 'dob' 
+    # replace on column: 'dob'
     survey_df = survey_df.replace({np.nan: ""})
     survey_df["age"] = survey_df["dob"].apply(calculate_age)
 
-    survey_df = survey_df.replace({"educationLevel" : { "lessThanprimary\n" : "lessThanprimary"},
-                   })
+    survey_df = survey_df.replace(
+        {"educationLevel": {"lessThanprimary\n": "lessThanprimary"}}
+    )
 
-    environmental_df = environmental_df.replace({"conditionoFloorinyourhouse" : { "dirtPoor" : "poor", "cementPoor" : "working","dirtWorking":"working","cementWorking":"good"},
-                            "conditionoRoofinyourhouse":{"bad":"poor","normal":"working"},
-                            "houseownership":{"owned":"Yes","rented":"No"},
-                            "latrineAccess":{"N":"No","Y":"Yes"},
-                            "clinicAccess":{"N":"No","Y":"Yes"}})
+    environmental_df = environmental_df.replace(
+        {
+            "conditionoFloorinyourhouse": {
+                "dirtPoor": "poor",
+                "cementPoor": "working",
+                "dirtWorking": "working",
+                "cementWorking": "good",
+            },
+            "conditionoRoofinyourhouse": {"bad": "poor", "normal": "working"},
+            "houseownership": {"owned": "Yes", "rented": "No"},
+            "latrineAccess": {"N": "No", "Y": "Yes"},
+            "clinicAccess": {"N": "No", "Y": "Yes"},
+        }
+    )
 
     # Clean City Names
     def f(x):
@@ -113,7 +123,7 @@ def clean_data():
     # Make all lowercase
     survey_df["city"] = survey_df["city"].str.lower()
 
-        # sex
+    # sex
     survey_df["sex"] = survey_df["sex"].str.lower()
 
     # dob and age (some are negative or too big)
@@ -151,18 +161,59 @@ def clean_data():
     df["age"] = df["age"].replace("", np.nan)
     df["age"] = df["age"].astype("float").astype("Int64")
 
-    df = df.replace({"educationLevel" : { "lessThanprimary" : "Less Than Primary School", "primary" : "Completed Primary School",
-                    "college":"Completed College","highschool":"Completed High School","someHighSchool":"Some High School","someCollege":"Some College"},
-                        "waterAccess":{"2-3AWeek":"2-3x A Week","4-6AWeek":"4-6x A Week","1AMonth":"1x A Month","1AWeek":"1x A Week","everyday":"Every day"},
-                        "conditionoFloorinyourhouse":{"good":"Good","poor":"Needs Repair","working":"Adequate"},
-                        "conditionoRoofinyourhouse":{"working":"Adequate","poor":"Needs Repair"},
-                        "stoveType":{"cementStove-Ventilation":"Yes - Cement Stove","openfire-noVentilation":"No - Open Fire"},
-                        "houseMaterial":{"block":"Block","wood":"Wood","partBlock_partWood":"Mix with Block and Wood","zinc":"Zinc","brick":"Brick",
-                    "other":"Other","clay":"Clay"},
-                        "electricityAccess":{"sometimes":"Sometimes","always":"Always","never":"Never"},
-                        "foodSecurity":{"not_sure":"Uncertain","N":"No","Y":"Yes"},
-                        "govAssistance":{"aprendiendo":"Learning","solidaridad":"Solidarity","other":"Other","no_assistance":"No Assistance"}})
-
+    df = df.replace(
+        {
+            "educationLevel": {
+                "lessThanprimary": "Less Than Primary School",
+                "primary": "Completed Primary School",
+                "college": "Completed College",
+                "highschool": "Completed High School",
+                "someHighSchool": "Some High School",
+                "someCollege": "Some College",
+            },
+            "waterAccess": {
+                "2-3AWeek": "2-3x A Week",
+                "4-6AWeek": "4-6x A Week",
+                "1AMonth": "1x A Month",
+                "1AWeek": "1x A Week",
+                "everyday": "Every day",
+            },
+            "conditionoFloorinyourhouse": {
+                "good": "Good",
+                "poor": "Needs Repair",
+                "working": "Adequate",
+            },
+            "conditionoRoofinyourhouse": {
+                "working": "Adequate",
+                "poor": "Needs Repair",
+            },
+            "stoveType": {
+                "cementStove-Ventilation": "Yes - Cement Stove",
+                "openfire-noVentilation": "No - Open Fire",
+            },
+            "houseMaterial": {
+                "block": "Block",
+                "wood": "Wood",
+                "partBlock_partWood": "Mix with Block and Wood",
+                "zinc": "Zinc",
+                "brick": "Brick",
+                "other": "Other",
+                "clay": "Clay",
+            },
+            "electricityAccess": {
+                "sometimes": "Sometimes",
+                "always": "Always",
+                "never": "Never",
+            },
+            "foodSecurity": {"not_sure": "Uncertain", "N": "No", "Y": "Yes"},
+            "govAssistance": {
+                "aprendiendo": "Learning",
+                "solidaridad": "Solidarity",
+                "other": "Other",
+                "no_assistance": "No Assistance",
+            },
+        }
+    )
 
     # Rename columnn names for mapping. Also Filter out to only include necessary columns
 
@@ -228,9 +279,7 @@ def clean_data():
         right_on=["communityname"],
         how="left",
     )
-    df = pd.merge(
-        df, clean_city, left_on=["City"], right_on=["city"], how="left"
-    )
+    df = pd.merge(df, clean_city, left_on=["City"], right_on=["city"], how="left")
 
     df = df.drop(columns=["city", "communityname"])
 
@@ -248,5 +297,4 @@ def clean_data():
     df = df[df["Longitude"].astype(float) > lonmin]
     df = df[df["Longitude"].astype(float) < lonmax]
 
-    return(df)
-
+    return df
