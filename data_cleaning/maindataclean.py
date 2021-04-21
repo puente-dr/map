@@ -143,11 +143,40 @@ def clean_data():
     )
     df = script.clean_location_values(df,clean_locations)
 
+<<<<<<< Updated upstream
     # Remove locations with latititude and longitude outside threshold
+=======
+    # Ensure that data has geographic coordinates and remove outliers
+    cleandf4 = cleandf3[cleandf3["Latitude"] != ""]
+
+
+    # Remove general outliers for latitude and longitude (outside of the DR)
+>>>>>>> Stashed changes
     latmin = 17
     latmax = 20
     lonmin = -72
     lonmax = -68
     df = script.geo_clean(df,latmin,latmax,lonmin,lonmax)
 
+<<<<<<< Updated upstream
     return df
+=======
+    cleandf4 = cleandf4[cleandf4["Latitude"].astype(float) > latmin]
+    cleandf4 = cleandf4[cleandf4["Latitude"].astype(float) < latmax]
+    cleandf4 = cleandf4[cleandf4["Longitude"].astype(float) > lonmin]
+    cleandf4 = cleandf4[cleandf4["Longitude"].astype(float) < lonmax]
+
+    #Remove outliers that fall outside 2std dev of community values
+    def is_outlier(s):
+        lower_limit = s.mean() - (s.std() * 2)
+        upper_limit = s.mean() + (s.std() * 2)
+        return ~s.between(lower_limit, upper_limit)
+
+    cleandf5 = cleandf4[~cleandf4.groupby('Community')['Latitude'].apply(is_outlier)]
+    cleandf5 = cleandf5[~cleandf5.groupby('Community')['Longitude'].apply(is_outlier)]
+
+    df = cleandf5
+    # Calculate Missings
+    # df = df.replace(np.nan,'')
+    return df, clean_community_names, clean_city_names
+>>>>>>> Stashed changes
