@@ -14,7 +14,7 @@ from mapboxgl.viz import *
 import numpy as np
 import pandas as pd
 from statistics import *
-from data_cleaning import script, maindataclean
+from data_cleaning import maindataclean
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
