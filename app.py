@@ -25,7 +25,6 @@ server = app.server
 df = maindataclean.clean_data()
 
 #Remove Tireo bc no information on it in the current data frame
-<<<<<<< Updated upstream
 city_names = sorted(df["City"].dropna().unique().tolist())
 #city_names.remove('Tireo')
 
@@ -33,12 +32,6 @@ city_names = sorted(df["City"].dropna().unique().tolist())
 community_focus = ['Los Gajitos', 'El Canal', 'Cañada las Palmas', 'El Convento', 'Los Embassadores', 'Los Mangos','Cuidad de Dios']
 community_names = community_focus
 df = df[df['Community'].isin(community_focus)]
-=======
-city_names.remove('Tireo')
-
-
-all_location_options = {"City":city_names,"Community":community_names}
->>>>>>> Stashed changes
 
 # Map
 all_location_options = {"City":city_names,"Community":community_names}
@@ -57,19 +50,11 @@ all_health_options = {
     "Latrine or Bathroom Access": ["Yes", "No"],
 }
 
-<<<<<<< Updated upstream
 color_map = {"Clinic Access":{'Yes':'#016930','No':'#03CA5D'},
     "Water Access":{"Every day":'#013856',"4-6x A Week":'#016ca0',"2-3x A Week":'#0099dc',"1x A Week":'#85e8ff', "1x A Month":'#cef6fe',"Never":'#f3fdff'},
     "Floor Condition": {"Good":'#23015B',  "Adequate":'#9E63FF',"Needs Repair":'#CFB2FE'},
     "Roof Condition": {"Adequate":'#dd8b01', "Needs Repair":'#fdc475'},
     "Latrine or Bathroom Access":{'Yes':'#740702','No':'#f78a78'}}
-=======
-color_map = {"Clinic Access":{'Yes':'#90d28d','No':'#4283bc'},
-    "Water Access":{"Every day":'#90d28d',"4-6x A Week":'#40621e',"2-3x A Week":'#973961',"1x A Week":'#70319d', "1x A Month":'#4a1c31',"Never":'#4283bc'},
-    "Floor Condition": {"Good":'#90d28d',  "Adequate":'#cd829b',"Needs Repair":'#4283bc'},
-    "Roof Condition": {"Adequate":'#90d28d', "Needs Repair":'#4283bc'},
-    "Latrine or Bathroom Access":{'Yes':'#90d28d','No':'#4283bc'}}
->>>>>>> Stashed changes
 
 app.layout = html.Div(
     [
@@ -309,7 +294,6 @@ def set_display_children(location_selected_feature, location_selected_option,hea
         )
         fig.update_traces(#ids='123test',
         marker_size=15)
-<<<<<<< Updated upstream
         # fig.add_trace(go.Scattermapbox(
         #     lat=lat_val,
         #     lon=lon_val,
@@ -323,21 +307,6 @@ def set_display_children(location_selected_feature, location_selected_option,hea
         # hoverinfo='none',
         # #coloraxis_showscale=False
         # ))
-=======
-        fig.add_trace(go.Scattermapbox(
-            lat=lat_val,
-            lon=lon_val,
-            mode='markers',
-            marker=go.scattermapbox.Marker(color='grey',
-                #below='123test',
-                allowoverlap=False,
-                size=18,
-                opacity=0.4
-                ),
-        hoverinfo='none',
-        #coloraxis_showscale=False
-        ))
->>>>>>> Stashed changes
         fig.update_layout(hoverlabel=dict(bgcolor="white", font_size=16, font_family="Roboto"))
 
 
