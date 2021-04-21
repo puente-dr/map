@@ -225,10 +225,6 @@ def set_location_options(location_selected_feature):
 def set_location_options_value(location_available_options):
     return location_available_options[0]["value"]
 
-@app.callback(Output("location-options-dropdown", "value"), Input("location-options-dropdown", "options"))
-def set_location_options_value(location_available_options):
-    return location_available_options[0]["value"] 
-
 @app.callback(
     Output("health-options-dropdown", "options"),
     Input("health-features-dropdown", "value"),
