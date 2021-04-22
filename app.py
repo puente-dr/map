@@ -23,6 +23,9 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 
 df = maindataclean.clean_data()
+proj_df = pd.read_excel(
+        "data/Puente Project Tracker 1-8.xlsx", sheet_name="MapCommunities"
+    )
 
 # Remove Tireo bc no information on it in the current data frame
 city_names = sorted(df["City"].dropna().unique().tolist())
@@ -86,24 +89,16 @@ app.layout = html.Div(
                         id="display-selected-values",
                         figure={},
                         style={
-                            "display": "block",
-                            "top": "0",
-                            "left": "0",
-                            "position": "fixed",
-                            "width": "75%",
-                            "height": "100%",
+                            # This controls the Map Div
+                            "height": "800px"
                         },
-                    ),
-                    style={"background-color": "#f8f7f6"},
-                ),
-                # html.Div(id='dd-output-container'),
+                    )
+                )
             ],
             style={
+                # This controls the Map Container Div
                 "background-color": "#f8f7f6",
-                "width": "100%",
-                "display": "table",
-                "top": "0",
-                "left": "0",
+                "flex": "2 0 0",
             },
         ),
         html.Div(
@@ -127,8 +122,7 @@ app.layout = html.Div(
                                 )
                             ]
                         ),
-                    ],
-                    style={"width": "100%"},
+                    ]
                 ),
                 html.Div(
                     [
@@ -148,7 +142,7 @@ app.layout = html.Div(
                     ],
                     style={"width": "100%"},
                 ),
-                html.Hr(style={"margin-top": "20px", "margin-bottom": "20px"}),
+                html.Hr(style={"margin-top": "20px","margin-bottom":"20px"}),
                 html.Div(
                     [
                         html.Div(
@@ -193,24 +187,24 @@ app.layout = html.Div(
                     style={"width": "100%"},
                     className="custom-dropdown",
                 ),
-                html.Hr(style={"margin-top": "20px", "margin-bottom": "20px"}),
                 html.Div(
                     id="dd-output-container",
                     style={"font-family": "Roboto", "font-size": "20px"},
                 ),
             ],
             style={
-                "width": "25%",
-                "position": "fixed",
-                "top": "1",
-                "right": "0",
-                "display": "table",
-                "padding": "40px",
+                # This controls the Features Table Div
                 "background-color": "#f8f7f6",
+                "flex": "1 0 0",
             },
         ),
     ],
-    style={"background-color": "#f8f7f6", "top": "1", "left": "0"},
+    style={
+        # This controls the Div for the Entire Visualization
+        "display": "flex",
+        "flex-direction": "row",
+        "background-color": "#f8f7f6",
+    },
 )
 
 
@@ -233,7 +227,6 @@ def set_location_options(location_selected_feature):
 )
 def set_location_options_value(location_available_options):
     return location_available_options[0]["value"]
-
 
 @app.callback(
     Output("health-options-dropdown", "options"),
@@ -291,15 +284,33 @@ def update_output(
             dff[dff["Water Access"].isin(["1x A Month", "Never", "1x A Week"])]
         ) / len(dff)
         percentage = "{:.0%}".format(num)
-        return "In {}, {} of housholds have inadequate access to water".format(
-            location_selected_option, percentage
-        )
+        if location_selected_option in proj_df['Community'].unique():
+            water_filters = proj_df.loc[proj_df['Community']==location_selected_option,'Water Filters'].iloc[0]
+        else:
+            water_filters = 0
+        if water_filters >0:
+            return "In {}, {} of housholds have inadequate access to water. \n\n Puente has distributed {} water filters in this community.".format(
+            location_selected_option, percentage,water_filters
+            )
+        else:
+            return "In {}, {} of housholds have inadequate access to water".format(
+                location_selected_option, percentage
+            )
     if health_selected_feature == "Floor Condition":
         num = len(dff[dff["Floor Condition"] == "Needs Repair"]) / len(dff)
         percentage = "{:.0%}".format(num)
-        return "In {}, {} of housholds need flooring repairs".format(
-            location_selected_option, percentage
-        )
+        if location_selected_option in proj_df['Community'].unique():
+            floors = proj_df.loc[proj_df['Community']==location_selected_option,'Floors'].iloc[0]
+        else:
+            floors = 0
+        if floors> 0:
+            return ("In {}, {} of housholds need flooring repairs.".format(location_selected_option, percentage) + "\n"+"Puente has helped repair {} floors in this community.".format(
+            floors
+            ))
+        else:
+            return "In {}, {} of housholds need flooring repairs".format(
+                location_selected_option, percentage
+            )
     if health_selected_feature == "Roof Condition":
         num = len(dff[dff["Roof Condition"] == "Needs Repair"]) / len(dff)
         percentage = "{:.0%}".format(num)
@@ -309,9 +320,19 @@ def update_output(
     if health_selected_feature == "Latrine or Bathroom Access":
         num = len(dff[dff["Latrine or Bathroom Access"] == "No"]) / len(dff)
         percentage = "{:.0%}".format(num)
-        return "In {}, {} of housholds do not have access to latrines or bathrooms".format(
+        if location_selected_option in proj_df['Community'].unique():
+            bathrooms = proj_df.loc[proj_df['Community']==location_selected_option,'Bathrooms'].iloc[0]
+        else:
+            bathrooms = 0
+        if  bathroomes > 0:
+            return "In {}, {} of housholds do not have access to latrines or bathrooms.\n\nPuente has helped install {} bathrooms in this community.".format(
+            location_selected_option, percentage,bathrooms
+            )
+        else:
+            return "In {}, {} of housholds do not have access to latrines or bathrooms. \n \n ".format(
             location_selected_option, percentage
-        )
+            )
+
     # else if health_feature == 'Water Access':
     # else if health_feature == 'Floor Condition':
     # else if health_feature == 'Roof Condition':
@@ -399,10 +420,10 @@ def set_display_children(
                 "Latrine or Bathroom Access",
             ],
         )
-        fig.update_traces(
-            hoverinfo="lon",
-            hovertemplate="<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}",
-        )
+        # fig.update_traces(
+        #     hoverinfo="lon",
+        #     hovertemplate="<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}",
+        # )
         fig.update_traces(marker_size=15)  # ids='123test',
         # fig.add_trace(go.Scattermapbox(
         #     lat=lat_val,
@@ -420,6 +441,24 @@ def set_display_children(
         fig.update_layout(
             hoverlabel=dict(bgcolor="white", font_size=16, font_family="Roboto")
         )
+        fig.update_traces(#ids='123test',
+        marker_size=15)
+        # fig.add_trace(go.Scattermapbox(
+        #     lat=lat_val,
+        #     lon=lon_val,
+        #     mode='markers',
+        #     marker=go.scattermapbox.Marker(color='grey',
+        #         #below='123test',
+        #         allowoverlap=False,
+        #         size=18,
+        #         opacity=0.4
+        #         ),
+        # hoverinfo='none',
+        # #coloraxis_showscale=False
+        # ))
+        fig.update_layout(hoverlabel=dict(bgcolor="white", font_size=16, font_family="Roboto"))
+
+
 
     fig.update_layout(
         autosize=True,
