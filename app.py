@@ -23,6 +23,9 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 
 df = maindataclean.clean_data()
+proj_df = pd.read_excel(
+        "data/Puente Project Tracker 1-8.xlsx", sheet_name="MapCommunities"
+    )
 
 # Remove Tireo bc no information on it in the current data frame
 city_names = sorted(df["City"].dropna().unique().tolist())
@@ -281,15 +284,33 @@ def update_output(
             dff[dff["Water Access"].isin(["1x A Month", "Never", "1x A Week"])]
         ) / len(dff)
         percentage = "{:.0%}".format(num)
-        return "In {}, {} of housholds have inadequate access to water".format(
-            location_selected_option, percentage
-        )
+        if location_selected_option in proj_df['Community'].unique():
+            water_filters = proj_df.loc[proj_df['Community']==location_selected_option,'Water Filters'].iloc[0]
+        else:
+            water_filters = 0
+        if water_filters >0:
+            return "In {}, {} of housholds have inadequate access to water. \n\n Puente has distributed {} water filters in this community.".format(
+            location_selected_option, percentage,water_filters
+            )
+        else:
+            return "In {}, {} of housholds have inadequate access to water".format(
+                location_selected_option, percentage
+            )
     if health_selected_feature == "Floor Condition":
         num = len(dff[dff["Floor Condition"] == "Needs Repair"]) / len(dff)
         percentage = "{:.0%}".format(num)
-        return "In {}, {} of housholds need flooring repairs".format(
-            location_selected_option, percentage
-        )
+        if location_selected_option in proj_df['Community'].unique():
+            floors = proj_df.loc[proj_df['Community']==location_selected_option,'Floors'].iloc[0]
+        else:
+            floors = 0
+        if floors> 0:
+            return ("In {}, {} of housholds need flooring repairs.".format(location_selected_option, percentage) + "\n"+"Puente has helped repair {} floors in this community.".format(
+            floors
+            ))
+        else:
+            return "In {}, {} of housholds need flooring repairs".format(
+                location_selected_option, percentage
+            )
     if health_selected_feature == "Roof Condition":
         num = len(dff[dff["Roof Condition"] == "Needs Repair"]) / len(dff)
         percentage = "{:.0%}".format(num)
@@ -299,9 +320,19 @@ def update_output(
     if health_selected_feature == "Latrine or Bathroom Access":
         num = len(dff[dff["Latrine or Bathroom Access"] == "No"]) / len(dff)
         percentage = "{:.0%}".format(num)
-        return "In {}, {} of housholds do not have access to latrines or bathrooms".format(
+        if location_selected_option in proj_df['Community'].unique():
+            bathrooms = proj_df.loc[proj_df['Community']==location_selected_option,'Bathrooms'].iloc[0]
+        else:
+            bathrooms = 0
+        if  bathroomes > 0:
+            return "In {}, {} of housholds do not have access to latrines or bathrooms.\n\nPuente has helped install {} bathrooms in this community.".format(
+            location_selected_option, percentage,bathrooms
+            )
+        else:
+            return "In {}, {} of housholds do not have access to latrines or bathrooms. \n \n ".format(
             location_selected_option, percentage
-        )
+            )
+
     # else if health_feature == 'Water Access':
     # else if health_feature == 'Floor Condition':
     # else if health_feature == 'Roof Condition':
