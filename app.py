@@ -469,6 +469,7 @@ def set_display_children(
         autosize=True,
         # margins=dict{l:0},
         title="<b>Dominican Republic Health Data by Household</b><br>(Hover over map for details)",
+        title_font_color='black',
         title_font_family="Roboto",
         font_family="Roboto",
         geo_scope="world",
