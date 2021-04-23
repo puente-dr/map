@@ -62,22 +62,22 @@ all_health_options = {
 }
 
 color_map = {
-    "Clinic Access": {"Yes": "#016930", "No": "#03CA5D"},
+    "Clinic Access": {"Yes": "#03CA5D", "No": "#016930"},
     "Water Access": {
-        "Every day": "#013856",
-        "4-6x A Week": "#016ca0",
-        "2-3x A Week": "#0099dc",
-        "1x A Week": "#85e8ff",
-        "1x A Month": "#cef6fe",
-        "Never": "#f3fdff",
+        "Every day": "#f3fdff",
+        "4-6x A Week": "#cef6fe",
+        "2-3x A Week": "#85e8ff",
+        "1x A Week": "#0099dc",
+        "1x A Month": "#016ca0",
+        "Never": "#013856"
     },
     "Floor Condition": {
-        "Good": "#23015B",
+        "Good": "#CFB2FE",
         "Adequate": "#9E63FF",
-        "Needs Repair": "#CFB2FE",
+        "Needs Repair": "#23015B",
     },
-    "Roof Condition": {"Adequate": "#dd8b01", "Needs Repair": "#fdc475"},
-    "Latrine or Bathroom Access": {"Yes": "#740702", "No": "#f78a78"},
+    "Roof Condition": {"Adequate": "#fdc475", "Needs Repair": "#dd8b01"},
+    "Latrine or Bathroom Access": {"Yes": "#f78a78", "No":"#740702" },
 }
 
 app.layout = html.Div(
@@ -87,17 +87,20 @@ app.layout = html.Div(
                 html.Div(
                     dcc.Graph(
                         id="display-selected-values",
-                        figure={},
+                        figure={'layout': {
+                                'paper_bgcolor': "#f8f7f6",
+                                'plot_bgcolor': "#f8f7f6"}
+                        },
                         style={
                             # This controls the Map Div
-                            "height": "800px"
+                            "height": "800px","background-color": "#f8f7f6"
                         },
-                    )
+                    ),style={"backgroundColor": "#f8f7f6"},
                 )
             ],
             style={
                 # This controls the Map Container Div
-                "background-color": "#f8f7f6",
+                "backgroundColor": "#f8f7f6",
                 "flex": "2 0 0",
             },
         ),
@@ -189,7 +192,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     id="dd-output-container",
-                    style={"font-family": "Roboto", "font-size": "20px"},
+                    style={"font-family": "Roboto", "font-size": "20px",'whiteSpace': 'pre-wrap'},
                 ),
             ],
             style={
@@ -276,7 +279,7 @@ def update_output(
     if health_selected_feature == "Clinic Access":
         num = len(dff[dff["Clinic Access"] == "No"]) / len(dff)
         percentage = "{:.0%}".format(num)
-        return "In {}, {} of housholds do not have access to clinics".format(
+        return "\nIn {}, {} of housholds do not have access to clinics".format(
             location_selected_option, percentage
         )
     if health_selected_feature == "Water Access":
@@ -289,11 +292,11 @@ def update_output(
         else:
             water_filters = 0
         if water_filters >0:
-            return "In {}, {} of housholds have inadequate access to water. \n\n Puente has distributed {} water filters in this community.".format(
+            return "\nIn {}, {} of housholds have inadequate access to water. \n\n Puente has distributed {} water filters in this community.".format(
             location_selected_option, percentage,water_filters
             )
         else:
-            return "In {}, {} of housholds have inadequate access to water".format(
+            return "\nIn {}, {} of housholds have inadequate access to water".format(
                 location_selected_option, percentage
             )
     if health_selected_feature == "Floor Condition":
@@ -304,17 +307,17 @@ def update_output(
         else:
             floors = 0
         if floors> 0:
-            return ("In {}, {} of housholds need flooring repairs.".format(location_selected_option, percentage) + "\n"+"Puente has helped repair {} floors in this community.".format(
+            return ("\nIn {}, {} of housholds need flooring repairs.".format(location_selected_option, percentage) + "\n\n"+"Puente has helped repair {} floors in this community.".format(
             floors
             ))
         else:
-            return "In {}, {} of housholds need flooring repairs".format(
+            return "\nIn {}, {} of housholds need flooring repairs".format(
                 location_selected_option, percentage
             )
     if health_selected_feature == "Roof Condition":
         num = len(dff[dff["Roof Condition"] == "Needs Repair"]) / len(dff)
         percentage = "{:.0%}".format(num)
-        return "In {}, {} of housholds need roof repairs".format(
+        return "\nIn {}, {} of housholds need roof repairs".format(
             location_selected_option, percentage
         )
     if health_selected_feature == "Latrine or Bathroom Access":
@@ -324,12 +327,12 @@ def update_output(
             bathrooms = proj_df.loc[proj_df['Community']==location_selected_option,'Bathrooms'].iloc[0]
         else:
             bathrooms = 0
-        if  bathroomes > 0:
-            return "In {}, {} of housholds do not have access to latrines or bathrooms.\n\nPuente has helped install {} bathrooms in this community.".format(
+        if  bathrooms > 0:
+            return "\nIn {}, {} of housholds do not have access to latrines or bathrooms.\n\nPuente has helped install {} bathrooms in this community.".format(
             location_selected_option, percentage,bathrooms
             )
         else:
-            return "In {}, {} of housholds do not have access to latrines or bathrooms. \n \n ".format(
+            return "\nIn {}, {} of housholds do not have access to latrines or bathrooms. \n \n ".format(
             location_selected_option, percentage
             )
 
@@ -369,7 +372,6 @@ def set_display_children(
         or len(dff[dff[health_selected_feature].isin(health_selected_option)]) == 0
     ):
         fig = px.scatter_mapbox(
-            bgcolor="#f8f7f6",
             data_frame=dff,  # [df['Clinic Access']==value],
             lat=dff["Latitude"],
             lon=dff["Longitude"],
@@ -456,7 +458,6 @@ def set_display_children(
         # hoverinfo='none',
         # #coloraxis_showscale=False
         # ))
-        fig.update_layout(hoverlabel=dict(bgcolor="white", font_size=16, font_family="Roboto"))
 
 
 
@@ -487,6 +488,12 @@ def set_display_children(
             # x=0
         ),
     )
+    #fig.update_layout(geo=dict(bgcolor= '#f8f7f6'))
+    fig.update_layout(
+                                   {'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+                                    'paper_bgcolor': 'rgba(0, 0, 0, 0)'})
+                                    
+
 
     return fig
 
