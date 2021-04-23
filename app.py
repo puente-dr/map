@@ -366,6 +366,10 @@ def set_display_children(
     dff = df[df[location_selected_feature] == location_selected_option]
     avg_lat = mean(dff["Latitude"])
     avg_lon = mean(dff["Longitude"])
+    if location_selected_feature == 'City':
+        zoom_level=13
+    if location_selected_feature == 'Community':
+        zoom_level=15
 
     if (
         health_selected_option == []
@@ -375,7 +379,7 @@ def set_display_children(
             data_frame=dff,  # [df['Clinic Access']==value],
             lat=dff["Latitude"],
             lon=dff["Longitude"],
-            zoom=15,
+            zoom=zoom_level,
             hover_data={
                 "Water Access": False,
                 "Clinic Access": False,
@@ -408,7 +412,7 @@ def set_display_children(
                 "Longitude": False,
                 "Latitude": False,
             },
-            zoom=15,
+            zoom=zoom_level,
             opacity=0.8,
             category_orders={
                 health_selected_feature: all_health_options[health_selected_feature]
