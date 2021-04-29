@@ -6,6 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+#Virtual environments
+mapvenv/
+testvenv4/
+
+#Old Scratch Files
+Scratch/
+
 # Distribution / packaging
 .Python
 build/

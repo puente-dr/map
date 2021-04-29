@@ -1,6 +1,6 @@
 # Import packages
-from datetime import datetime, date
 import json
+from . import script
 import numpy as np
 import pandas as pd
 import difflib
@@ -9,10 +9,9 @@ import difflib
 survey_json = "data/SurveyDataMarch3.json"
 environmental_json = "data/HistoryEnvironmentalHealthMarch3.json"
 
-
 def clean_data():
-    #Open Files 
-    with open(survey_json,encoding="utf8") as file:
+    # Open files 
+    with open(survey_json, encoding="utf8") as file:
         data = json.load(file)
     survey_df = pd.json_normalize(data["results"])
 
@@ -21,8 +20,7 @@ def clean_data():
     environmental_df = pd.json_normalize(data["results"])
 
     # Filter Data
-    survey_df = survey_df[
-        [
+    columns_to_keep = [
             "objectId",
             "fname",
             "lname",
@@ -47,80 +45,27 @@ def clean_data():
             "createdAt",
             "updatedAt",
         ]
-    ]
+    survey_df = script.filter_df(survey_df,columns_to_keep)
 
-    def calculate_age(born):
-        if "-" in born:
-            mod = born.split("-")
-            # born = datetime.strptime(born, "%Y-%m-%d").date()
-            today = date.today()
-            return int(today.year - int(mod[0]))
-        elif "/" in born:
-            """
-            x = ""
-            for s in born.split():
-                if s.isdigit():
-                    x+=s
-            """
-            mod = born.split("/")
-            today = date.today()
-            try:
-                return int(today.year - int(mod[2]))
-            except:
-                return None
-        else:
-            return None
-
-    # Calculate age column
-    #replace on column: 'dob' 
+    # Create age column
     survey_df = survey_df.replace({np.nan: ""})
-    survey_df["age"] = survey_df["dob"].apply(calculate_age)
+    survey_df["age"] = survey_df["dob"].apply(script.calculate_age)
 
-    survey_df = survey_df.replace({"educationLevel" : { "lessThanprimary\n" : "lessThanprimary"},
-                   })
+    # Clean Survey adn Environmental Dataframes
+    survey_replacements = {"educationLevel" : { "lessThanprimary\n" : "lessThanprimary"}}
+    environmental_replacements = {"conditionoFloorinyourhouse" : { "dirtPoor" : "poor", "cementPoor" : "working","dirtWorking":"working","cementWorking":"good"},
+                        "conditionoRoofinyourhouse":{"bad":"poor","normal":"working"},
+                        "houseownership":{"owned":"Yes","rented":"No"},
+                        "bathroomAccess":{"N":"No","Y":"Yes","Yeses":"Yes","Noo":"No"},
+                        "latrineAccess":{"N":"No","Y":"Yes","Yeses":"Yes","Noo":"No"},
+                        "clinicAccess":{"N":"No","Y":"Yes"}}
+    survey_df = script.replace_values(survey_df,survey_replacements)
+    environmental_df = script.replace_values(environmental_df,environmental_replacements)
 
-    environmental_df = environmental_df.replace({"conditionoFloorinyourhouse" : { "dirtPoor" : "poor", "cementPoor" : "working","dirtWorking":"working","cementWorking":"good"},
-                            "conditionoRoofinyourhouse":{"bad":"poor","normal":"working"},
-                            "houseownership":{"owned":"Yes","rented":"No"},
-                            "latrineAccess":{"N":"No","Y":"Yes"},
-                            "clinicAccess":{"N":"No","Y":"Yes"}})
+    # Initial data cleaning for survey_df
+    survey_df = script.initial_cleaning(survey_df)
 
-    # Clean City Names
-    def f(x):
-        try:
-            return difflib.get_close_matches(x["city"], city_names)[0]
-        except:
-            return ""
-
-    # Cities Identified
-    city_names = [
-        "tireo",
-        "spm",
-        "adansi",
-        "consuelo",
-        "constanza",
-        "la romana",
-        "ciudad de dios",
-        "la vega",
-        "santo domingo",
-        "asokwa",
-        "santiago",
-        "santa fe",
-        "san pedro de macorís",
-        "el seibo",
-    ]
-
-    # Make all lowercase
-    survey_df["city"] = survey_df["city"].str.lower()
-
-        # sex
-    survey_df["sex"] = survey_df["sex"].str.lower()
-
-    # dob and age (some are negative or too big)
-    survey_df[pd.to_numeric(survey_df["age"]) < 0] = ""
-    survey_df[pd.to_numeric(survey_df["age"]) > 110] = ""
-
-    # Create merged data
+    # Merge survey_df and environmental_df
     df = pd.merge(
         survey_df,
         environmental_df,
@@ -128,44 +73,29 @@ def clean_data():
         right_on=["client.objectId"],
         how="right",
     )
+
     del survey_df
     del environmental_df
 
-    df = df.drop_duplicates(subset=["client.objectId"])
-    df = df.drop(columns=["client.objectId", "objectId_y"])
-    df = df.rename(columns={"objectId_x": "objectId"})
-    df = df.replace({np.nan: ""})
+    # Post merge cleaning (removing duplicates, cleaning columns, ...)
+    df = script.post_merge_cleaning(df)
 
-    # Create new columns for latrine or bathroom access
-    df.loc[
-        (df["latrineAccess"] == "Y") | (df["bathroomAccess"] == "Y"),
-        "Latrine or Bathroom Access",
-    ] = "Yes"
-    df.loc[
-        (df["latrineAccess"] == "N") & (df["bathroomAccess"] == "N"),
-        "Latrine or Bathroom Access",
-    ] = "No"
+    # Replace values for cleaner mapping presentation
+    df_replacements = {"educationLevel" : { "lessThanprimary" : "Less Than Primary School", "primary" : "Completed Primary School",
+                        "college":"Completed College","highschool":"Completed High School","someHighSchool":"Some High School","someCollege":"Some College"},
+                            "waterAccess":{"2-3AWeek":"2-3x A Week","4-6AWeek":"4-6x A Week","1AMonth":"1x A Month","1AWeek":"1x A Week","everyday":"Every day"},
+                            "conditionoFloorinyourhouse":{"good":"Good","poor":"Needs Repair","working":"Adequate"},
+                            "conditionoRoofinyourhouse":{"working":"Adequate","poor":"Needs Repair"},
+                            "stoveType":{"cementStove-Ventilation":"Yes - Cement Stove","openfire-noVentilation":"No - Open Fire"},
+                            "houseMaterial":{"block":"Block","wood":"Wood","partBlock_partWood":"Mix with Block and Wood","zinc":"Zinc","brick":"Brick",
+                        "other":"Other","clay":"Clay"},
+                            "electricityAccess":{"sometimes":"Sometimes","always":"Always","never":"Never"},
+                            "foodSecurity":{"not_sure":"Uncertain","N":"No","Y":"Yes"},
+                            "govAssistance":{"aprendiendo":"Learning","solidaridad":"Solidarity","other":"Other","no_assistance":"No Assistance"}}
 
-    # Change numbers to digits without decimals for numerical columns
-    # replace for age column
-    df["age"] = df["age"].replace("", np.nan)
-    df["age"] = df["age"].astype("float").astype("Int64")
-
-    df = df.replace({"educationLevel" : { "lessThanprimary" : "Less Than Primary School", "primary" : "Completed Primary School",
-                    "college":"Completed College","highschool":"Completed High School","someHighSchool":"Some High School","someCollege":"Some College"},
-                        "waterAccess":{"2-3AWeek":"2-3x A Week","4-6AWeek":"4-6x A Week","1AMonth":"1x A Month","1AWeek":"1x A Week","everyday":"Every day"},
-                        "conditionoFloorinyourhouse":{"good":"Good","poor":"Needs Repair","working":"Adequate"},
-                        "conditionoRoofinyourhouse":{"working":"Adequate","poor":"Needs Repair"},
-                        "stoveType":{"cementStove-Ventilation":"Yes - Cement Stove","openfire-noVentilation":"No - Open Fire"},
-                        "houseMaterial":{"block":"Block","wood":"Wood","partBlock_partWood":"Mix with Block and Wood","zinc":"Zinc","brick":"Brick",
-                    "other":"Other","clay":"Clay"},
-                        "electricityAccess":{"sometimes":"Sometimes","always":"Always","never":"Never"},
-                        "foodSecurity":{"not_sure":"Uncertain","N":"No","Y":"Yes"},
-                        "govAssistance":{"aprendiendo":"Learning","solidaridad":"Solidarity","other":"Other","no_assistance":"No Assistance"}})
-
+    df = script.replace_values(df,df_replacements)
 
     # Rename columnn names for mapping. Also Filter out to only include necessary columns
-
     map_columns = [
         "objectId",
         "educationLevel",
@@ -185,7 +115,7 @@ def clean_data():
         "govAssistance",
         "Latrine or Bathroom Access",
     ]
-    rename_columns = [
+    rename_columnss = [
         "objectId",
         "Education Level",
         "Latitude",
@@ -204,49 +134,19 @@ def clean_data():
         "Government Assistance",
         "Latrine or Bathroom Access",
     ]
+    df = script.rename_columns(df,map_columns,rename_columnss)
 
-    df = df[df.columns[df.columns.isin(map_columns)]]
-    for i in np.arange(len(map_columns)):
-        df = df.rename(columns={map_columns[i]: rename_columns[i]})
-
-    # Clean Community Names w scott data
-    excel_clean = pd.read_excel(
+    # Clean community names with Scott's source of truth community list
+    clean_locations = pd.read_excel(
         "data/Puente Dashboard 2-24-21.xlsx", sheet_name="Environmental Data"
     )
+    df = script.clean_location_values(df,clean_locations)
 
-    # Get clean community and clean city names into individual dataframes
-    clean_community = excel_clean[
-        ["Community (Clean)", "communityname"]
-    ].drop_duplicates()
-    clean_city = excel_clean[["City (Clean)", "city"]].drop_duplicates()
-
-    # Merge clean names with data in df
-    df = pd.merge(
-        df,
-        clean_community,
-        left_on=["Community"],
-        right_on=["communityname"],
-        how="left",
-    )
-    df = pd.merge(
-        df, clean_city, left_on=["City"], right_on=["city"], how="left"
-    )
-
-    df = df.drop(columns=["city", "communityname"])
-
-    # Ensure that data has geographic coordinates
-    df = df[df["Latitude"] != ""]
-
-    # Remove outliers for latitude and longitude
+    # Remove locations with latititude and longitude outside threshold
     latmin = 17
     latmax = 20
     lonmin = -72
     lonmax = -68
+    df = script.geo_clean(df,latmin,latmax,lonmin,lonmax)
 
-    df = df[df["Latitude"].astype(float) > latmin]
-    df = df[df["Latitude"].astype(float) < latmax]
-    df = df[df["Longitude"].astype(float) > lonmin]
-    df = df[df["Longitude"].astype(float) < lonmax]
-
-    return(df)
-
+    return df
