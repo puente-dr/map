@@ -93,7 +93,7 @@ app.layout = html.Div(
                         },
                         style={
                             # This controls the Map Div
-                            "height": "650px","background-color": "#f8f7f6"
+                            "height": "200px","background-color": "#f8f7f6"
                         },
                     ),style={"backgroundColor": "#f8f7f6"},
                 )
