@@ -24,8 +24,8 @@ server = app.server
 
 df = maindataclean.clean_data()
 proj_df = pd.read_excel(
-        "data/Puente Project Tracker 1-8.xlsx", sheet_name="MapCommunities"
-    )
+    "data/Puente Project Tracker 1-8.xlsx", sheet_name="MapCommunities"
+)
 
 # Remove Tireo bc no information on it in the current data frame
 city_names = sorted(df["City"].dropna().unique().tolist())
@@ -69,7 +69,7 @@ color_map = {
         "2-3x A Week": "#85e8ff",
         "1x A Week": "#0099dc",
         "1x A Month": "#016ca0",
-        "Never": "#013856"
+        "Never": "#013856",
     },
     "Floor Condition": {
         "Good": "#CFB2FE",
@@ -77,7 +77,7 @@ color_map = {
         "Needs Repair": "#23015B",
     },
     "Roof Condition": {"Adequate": "#fdc475", "Needs Repair": "#dd8b01"},
-    "Latrine or Bathroom Access": {"Yes": "#f78a78", "No":"#740702" },
+    "Latrine or Bathroom Access": {"Yes": "#f78a78", "No": "#740702"},
 }
 
 app.layout = html.Div(
@@ -87,15 +87,19 @@ app.layout = html.Div(
                 html.Div(
                     dcc.Graph(
                         id="display-selected-values",
-                        figure={'layout': {
-                                'paper_bgcolor': "#f8f7f6",
-                                'plot_bgcolor': "#f8f7f6"}
+                        figure={
+                            "layout": {
+                                "paper_bgcolor": "#f8f7f6",
+                                "plot_bgcolor": "#f8f7f6",
+                            }
                         },
                         style={
                             # This controls the Map Div
-                            "height": "650px","background-color": "#f8f7f6"
+                            "height": "650px",
+                            "background-color": "#f8f7f6",
                         },
-                    ),style={"backgroundColor": "#f8f7f6"},
+                    ),
+                    style={"backgroundColor": "#f8f7f6"},
                 )
             ],
             style={
@@ -145,7 +149,7 @@ app.layout = html.Div(
                     ],
                     style={"width": "100%"},
                 ),
-                html.Hr(style={"margin-top": "20px","margin-bottom":"20px"}),
+                html.Hr(style={"margin-top": "20px", "margin-bottom": "20px"}),
                 html.Div(
                     [
                         html.Div(
@@ -192,7 +196,11 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     id="dd-output-container",
-                    style={"font-family": "Roboto", "font-size": "20px",'whiteSpace': 'pre-wrap'},
+                    style={
+                        "font-family": "Roboto",
+                        "font-size": "20px",
+                        "whiteSpace": "pre-wrap",
+                    },
                 ),
             ],
             style={
@@ -206,6 +214,7 @@ app.layout = html.Div(
         # This controls the Div for the Entire Visualization
         "display": "flex",
         "flex-direction": "row",
+        "flex-wrap": "wrap",
         "background-color": "#f8f7f6",
     },
 )
@@ -230,6 +239,7 @@ def set_location_options(location_selected_feature):
 )
 def set_location_options_value(location_available_options):
     return location_available_options[0]["value"]
+
 
 @app.callback(
     Output("health-options-dropdown", "options"),
@@ -287,13 +297,15 @@ def update_output(
             dff[dff["Water Access"].isin(["1x A Month", "Never", "1x A Week"])]
         ) / len(dff)
         percentage = "{:.0%}".format(num)
-        if location_selected_option in proj_df['Community'].unique():
-            water_filters = proj_df.loc[proj_df['Community']==location_selected_option,'Water Filters'].iloc[0]
+        if location_selected_option in proj_df["Community"].unique():
+            water_filters = proj_df.loc[
+                proj_df["Community"] == location_selected_option, "Water Filters"
+            ].iloc[0]
         else:
             water_filters = 0
-        if water_filters >0:
+        if water_filters > 0:
             return "\nIn {}, {} of housholds have inadequate access to water. \n\n Puente has distributed {} water filters in this community.".format(
-            location_selected_option, percentage,water_filters
+                location_selected_option, percentage, water_filters
             )
         else:
             return "\nIn {}, {} of housholds have inadequate access to water".format(
@@ -302,14 +314,20 @@ def update_output(
     if health_selected_feature == "Floor Condition":
         num = len(dff[dff["Floor Condition"] == "Needs Repair"]) / len(dff)
         percentage = "{:.0%}".format(num)
-        if location_selected_option in proj_df['Community'].unique():
-            floors = proj_df.loc[proj_df['Community']==location_selected_option,'Floors'].iloc[0]
+        if location_selected_option in proj_df["Community"].unique():
+            floors = proj_df.loc[
+                proj_df["Community"] == location_selected_option, "Floors"
+            ].iloc[0]
         else:
             floors = 0
-        if floors> 0:
-            return ("\nIn {}, {} of housholds need flooring repairs.".format(location_selected_option, percentage) + "\n\n"+"Puente has helped repair {} floors in this community.".format(
-            floors
-            ))
+        if floors > 0:
+            return (
+                "\nIn {}, {} of housholds need flooring repairs.".format(
+                    location_selected_option, percentage
+                )
+                + "\n\n"
+                + "Puente has helped repair {} floors in this community.".format(floors)
+            )
         else:
             return "\nIn {}, {} of housholds need flooring repairs".format(
                 location_selected_option, percentage
@@ -323,17 +341,19 @@ def update_output(
     if health_selected_feature == "Latrine or Bathroom Access":
         num = len(dff[dff["Latrine or Bathroom Access"] == "No"]) / len(dff)
         percentage = "{:.0%}".format(num)
-        if location_selected_option in proj_df['Community'].unique():
-            bathrooms = proj_df.loc[proj_df['Community']==location_selected_option,'Bathrooms'].iloc[0]
+        if location_selected_option in proj_df["Community"].unique():
+            bathrooms = proj_df.loc[
+                proj_df["Community"] == location_selected_option, "Bathrooms"
+            ].iloc[0]
         else:
             bathrooms = 0
-        if  bathrooms > 0:
+        if bathrooms > 0:
             return "\nIn {}, {} of housholds do not have access to latrines or bathrooms.\n\nPuente has helped install {} bathrooms in this community.".format(
-            location_selected_option, percentage,bathrooms
+                location_selected_option, percentage, bathrooms
             )
         else:
             return "\nIn {}, {} of housholds do not have access to latrines or bathrooms. \n \n ".format(
-            location_selected_option, percentage
+                location_selected_option, percentage
             )
 
     # else if health_feature == 'Water Access':
@@ -366,10 +386,10 @@ def set_display_children(
     dff = df[df[location_selected_feature] == location_selected_option]
     avg_lat = mean(dff["Latitude"])
     avg_lon = mean(dff["Longitude"])
-    if location_selected_feature == 'City':
-        zoom_level=13
-    if location_selected_feature == 'Community':
-        zoom_level=15
+    if location_selected_feature == "City":
+        zoom_level = 13
+    if location_selected_feature == "Community":
+        zoom_level = 15
 
     if (
         health_selected_option == []
@@ -447,8 +467,7 @@ def set_display_children(
         fig.update_layout(
             hoverlabel=dict(bgcolor="white", font_size=16, font_family="Roboto")
         )
-        fig.update_traces(#ids='123test',
-        marker_size=15)
+        fig.update_traces(marker_size=15)  # ids='123test',
         # fig.add_trace(go.Scattermapbox(
         #     lat=lat_val,
         #     lon=lon_val,
@@ -463,13 +482,11 @@ def set_display_children(
         # #coloraxis_showscale=False
         # ))
 
-
-
     fig.update_layout(
         autosize=True,
         # margins=dict{l:0},
         title="<b>Dominican Republic Health Data by Household</b><br>(Hover over map for details)",
-        title_font_color='black',
+        title_font_color="black",
         title_font_family="Roboto",
         font_family="Roboto",
         geo_scope="world",
@@ -493,12 +510,10 @@ def set_display_children(
             # x=0
         ),
     )
-    #fig.update_layout(geo=dict(bgcolor= '#f8f7f6'))
+    # fig.update_layout(geo=dict(bgcolor= '#f8f7f6'))
     fig.update_layout(
-                                   {'plot_bgcolor': 'rgba(0, 0, 0, 0)',
-                                    'paper_bgcolor': 'rgba(0, 0, 0, 0)'})
-                                    
-
+        {"plot_bgcolor": "rgba(0, 0, 0, 0)", "paper_bgcolor": "rgba(0, 0, 0, 0)"}
+    )
 
     return fig
 
