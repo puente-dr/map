@@ -511,12 +511,7 @@ def set_display_children(
     fig.update_layout(
         autosize=True,
         # margins=dict{l:0},
-<<<<<<< HEAD
         title="<b>        Dominican Republic Health Data by Household</b><br>        Hover over map for details",
-=======
-
-        title="<b>Dominican Republic Health Data by Household</b><br>Hover over map for details",
->>>>>>> a738708770dd485610b39945b3b2515f8f8f9116
         title_font_color='black',
         title_font_size=17,
 
