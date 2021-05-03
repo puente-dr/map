@@ -100,7 +100,6 @@ app.layout = html.Div(
                         },
                         style={
                             # This controls the Map Div
-
                             "height": "650px",
                             "background-color": "#f8f7f6",
                         },
@@ -120,7 +119,12 @@ app.layout = html.Div(
                     [
                         html.Div(
                             html.Label("Geographic Level of Detail"),
-                            style={"padding-top":"55px","font-family": "Roboto", "font-weight": "bold","font-size": '14px'},
+                            style={
+                                "padding-top": "55px",
+                                "font-family": "Roboto",
+                                "font-weight": "bold",
+                                "font-size": "14px",
+                            },
                         ),
                         html.Div(
                             [
@@ -141,7 +145,12 @@ app.layout = html.Div(
                     [
                         html.Div(
                             html.Label("Select Location..."),
-                            style={"padding-top":"5px","font-family": "Roboto", "font-weight": "bold","font-size": '14px'},
+                            style={
+                                "padding-top": "5px",
+                                "font-family": "Roboto",
+                                "font-weight": "bold",
+                                "font-size": "14px",
+                            },
                         ),
                         html.Div(
                             [
@@ -160,7 +169,11 @@ app.layout = html.Div(
                     [
                         html.Div(
                             html.Label("Household Features"),
-                            style={"font-family": "Roboto", "font-weight": "bold","font-size": '14px'},
+                            style={
+                                "font-family": "Roboto",
+                                "font-weight": "bold",
+                                "font-size": "14px",
+                            },
                         ),
                         html.Div(
                             [
@@ -182,7 +195,12 @@ app.layout = html.Div(
                     [
                         html.Div(
                             html.Label("Select Features..."),
-                            style={"padding-top":"5px","font-family": "Roboto", "font-weight": "bold","font-size": '14px'},
+                            style={
+                                "padding-top": "5px",
+                                "font-family": "Roboto",
+                                "font-weight": "bold",
+                                "font-size": "14px",
+                            },
                         ),
                         html.Div(
                             [
@@ -200,12 +218,15 @@ app.layout = html.Div(
                     style={"width": "100%"},
                     className="custom-dropdown",
                 ),
-                html.Hr(style={"margin-top": "20px","margin-bottom":"20px"}),
+                html.Hr(style={"margin-top": "20px", "margin-bottom": "20px"}),
                 html.Div(
                     id="dd-output-container",
-
-                    style={"margin-top": "0px","font-family": "Roboto", "font-size": "20px",'whiteSpace': 'pre-wrap'},
-
+                    style={
+                        "margin-top": "0px",
+                        "font-family": "Roboto",
+                        "font-size": "20px",
+                        "whiteSpace": "pre-wrap",
+                    },
                 ),
             ],
             style={
@@ -284,6 +305,7 @@ def set_health_options_value(health_available_options):
 # def print_intro(location_selected_feature):
 #     return "Puente collects data at the household level in order to adequately analyze local challenges and develop targeted solutions.  Explore the map below to better visualize and assess health and environmental challenges in the Dominican Republic."
 
+
 @app.callback(
     Output("dd-output-container", "children"),
     Input("location-features-dropdown", "value"),
@@ -316,10 +338,9 @@ def update_output(
             ].iloc[0]
         else:
             water_filters = 0
-        if water_filters >0:
+        if water_filters > 0:
             return "\nIn {}, {} of households have inadequate access to water. \n\n Puente has distributed {} water filters in this community.".format(
-            location_selected_option, percentage,water_filters
-
+                location_selected_option, percentage, water_filters
             )
         else:
             return "\nIn {}, {} of households have inadequate access to water".format(
@@ -334,11 +355,14 @@ def update_output(
             ].iloc[0]
         else:
             floors = 0
-        if floors> 0:
-            return ("\nIn {}, {} of households need flooring repairs.".format(location_selected_option, percentage) + "\n\n"+"Puente has helped repair {} floors in this community.".format(
-            floors
-            ))
-
+        if floors > 0:
+            return (
+                "\nIn {}, {} of households need flooring repairs.".format(
+                    location_selected_option, percentage
+                )
+                + "\n\n"
+                + "Puente has helped repair {} floors in this community.".format(floors)
+            )
 
         else:
             return "\nIn {}, {} of households need flooring repairs".format(
@@ -360,13 +384,13 @@ def update_output(
         else:
             bathrooms = 0
 
-        if  bathrooms > 0:
+        if bathrooms > 0:
             return "\nIn {}, {} of households do not have access to latrines or bathrooms.\n\nPuente has helped install {} bathrooms in this community.".format(
-            location_selected_option, percentage,bathrooms
+                location_selected_option, percentage, bathrooms
             )
         else:
             return "\nIn {}, {} of households do not have access to latrines or bathrooms. \n \n ".format(
-            location_selected_option, percentage
+                location_selected_option, percentage
             )
 
     # else if health_feature == 'Water Access':
@@ -427,7 +451,7 @@ def set_display_children(
 
     else:
         dff = dff[dff[health_selected_feature].isin(health_selected_option)]
-        dff = dff.replace('', 'No Data Available', regex=True)
+        dff = dff.replace("", "No Data Available", regex=True)
         lat_val = dff["Latitude"]
         lon_val = dff["Longitude"]
         fig = px.scatter_mapbox(
@@ -461,7 +485,7 @@ def set_display_children(
             ],
         )
 
-        fig.update_traces(     
+        fig.update_traces(
             hovertemplate="<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}<extra></extra>"
             # customdata=["customdata"],
             # community_info = customdata[0] if customdata[0]!=np.nan else 'No Information Available',
@@ -470,7 +494,7 @@ def set_display_children(
             # floorcondition_info = customdata[3] if customdata[3]!=np.nan else 'No Information Available',
             # roofcondition_info = customdata[4] if customdata[4]!=np.nan else 'No Information Available',
             # latrineorbathroomaccess_info = custom_data[5] if custom_data[5]!=np.nan else 'No Information Available',
-            #dff = dff[dff[health_selected_feature].isin(health_selected_option)]
+            # dff = dff[dff[health_selected_feature].isin(health_selected_option)]
             # if (dff['Water Access'].isin(all_health_options['Water Access']) == False):
             #     hovertemplate="<span style='font-size:20px'><b>No Data</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}<extra></extra>"
             # else:
@@ -512,9 +536,8 @@ def set_display_children(
         autosize=True,
         # margins=dict{l:0},
         title="<b>        Dominican Republic Health Data by Household</b><br>        Hover over map for details",
-        title_font_color='black',
+        title_font_color="black",
         title_font_size=17,
-
         title_font_family="Roboto",
         font_family="Roboto",
         geo_scope="world",
