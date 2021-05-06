@@ -86,7 +86,7 @@ def clean_data():
                             "waterAccess":{"2-3AWeek":"2-3x A Week","4-6AWeek":"4-6x A Week","1AMonth":"1x A Month","1AWeek":"1x A Week","everyday":"Every day"},
                             "conditionoFloorinyourhouse":{"good":"Good","poor":"Needs Repair","working":"Adequate"},
                             "conditionoRoofinyourhouse":{"working":"Adequate","poor":"Needs Repair"},
-                            "stoveType":{"cementStove-Ventilation":"Yes - Cement Stove","openfire-noVentilation":"No - Open Fire"},
+                            "stoveType":{"stoveTop":"Stove Top","cementStove-Ventilation":"Yes - Cement Stove","openfire-noVentilation":"No - Open Fire"},
                             "houseMaterial":{"block":"Block","wood":"Wood","partBlock_partWood":"Mix with Block and Wood","zinc":"Zinc","brick":"Brick",
                         "other":"Other","clay":"Clay"},
                             "electricityAccess":{"sometimes":"Sometimes","always":"Always","never":"Never"},
@@ -138,7 +138,7 @@ def clean_data():
 
     # Clean community names with Scott's source of truth community list
     clean_locations = pd.read_excel(
-        "data/Puente Dashboard 2-24-21.xlsx", sheet_name="Environmental Data"
+        "data/Puente Dashboard 4-19-21.xlsx", sheet_name="Environmental Data"
     )
     df = script.clean_location_values(df,clean_locations)
 
