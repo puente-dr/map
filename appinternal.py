@@ -30,21 +30,8 @@ city_proj_df = pd.read_excel(
     "data/Puente Project Tracker 1-8.xlsx", sheet_name="MapCities"
 )
 
+community_names = sorted(df["Community"].dropna().unique().tolist())
 city_names = sorted(df["City"].dropna().unique().tolist())
-
-# Community names for map
-community_focus = [
-    "Los Gajitos",
-    "El Canal",
-    "Cañada las Palmas",
-    "El Convento",
-    "Los Embassadores",
-    "Los Mangos",
-    "Cuidad de Dios",
-]
-
-community_names = community_focus
-df = df[df["Community"].isin(community_focus)]
 
 # Map
 all_location_options = {"City": city_names, "Community": community_names}
@@ -61,7 +48,25 @@ all_health_options = {
     "Floor Condition": ["Good", "Adequate", "Needs Repair"],
     "Roof Condition": ["Adequate", "Needs Repair"],
     "Latrine or Bathroom Access": ["Yes", "No"],
+    "Education Level":['Completed College''Some College','Completed High School','Some High School','Completed Primary School','Less Than Primary School'],
+    "Stove Ventilation":[
+          "stoveTop",
+          "Yes - Cement Stove",
+          "No - Open Fire",
+      ] ,
+      "House Material":[
+          "Block",
+          "Mix with Block and Wood",
+          "Wood",
+          "Brick",
+          "Clay",
+          "Zinc",
+          "Other",
+      ],
+      "Food Security":['Yes', 'No', 'Uncertain'],
+      "Government Assistance":['Solidarity', 'Learning', 'No Assistance','Other'],
 }
+
 
 color_map = {
     "Clinic Access": {"Yes": "#03CA5D", "No": "#016930"},
@@ -80,6 +85,23 @@ color_map = {
     },
     "Roof Condition": {"Adequate": "#fdc475", "Needs Repair": "#dd8b01"},
     "Latrine or Bathroom Access": {"Yes": "#f78a78", "No": "#740702"},
+    "Education Level":{'Completed College':'#fcf4a3','Some College':'#fce205','Completed High School':'#fda50f', 'Some High School':'#e25c02','Completed Primary School':'#e76eb1','Less Than Primary School':'#96304c'},
+      "Stove Ventilation":{
+          "stoveTop":'#fdab9f',
+          "Yes - Cement Stove":'#f79ac0',
+          "No - Open Fire":'#e11584',
+       } ,
+      "House Material":{
+          "Block":'#e9d4c7',
+          "Mix with Block and Wood":'#d4ab92',
+          "Wood":'#c48b69',
+          "Brick":'#9e623e',
+          "Clay":'#532915',
+          "Zinc":'#0b0704',
+          "Other":'#DCDCDC',
+      },
+      "Food Security":{ 'Yes':'#AFEEEE','No':'#00CED1', 'Uncertain':'#DCDCDC'},
+      "Government Assistance":{'Solidarity':'#b3d1b3','Learning':'#66a266', 'No Assistance':'#003200','Other':'#DCDCDC'},
 }
 
 app.layout = html.Div(
@@ -354,7 +376,36 @@ def update_output(
             return "\nIn {}, {} of households do not have access to latrines or bathrooms. \n \n ".format(
             location_selected_option, percentage
             )
-
+    if (health_selected_feature == "Education Level") & (int(len(dff))!=0):
+        num = len(dff[dff["Education Level"] == "Less Than Primary School"]) / len(dff)
+        percentage = "{:.0%}".format(num)
+        return "\nIn {}, {} of household representatives did not complete primary school.".format(
+            location_selected_option, percentage
+        )
+    if (health_selected_feature == "Stove Ventilation") & (int(len(dff))!=0):
+        num = len(dff[dff["Stove Ventilation"] == "No - Open Fire"]) / len(dff)
+        percentage = "{:.0%}".format(num)
+        return "\nIn {}, {} of households do not have adequate stone ventilation.".format(
+            location_selected_option, percentage
+        )
+    if (health_selected_feature == "House Material") & (int(len(dff))!=0):
+        num = len(dff[dff["House Material"] == "Zinc"]) / len(dff)
+        percentage = "{:.0%}".format(num)
+        return "\nIn {}, {} of households have houses made out of zinc.".format(
+            location_selected_option, percentage
+        )
+    if (health_selected_feature == "Food Security") & (int(len(dff))!=0):
+        num = len(dff[dff["Food Security"] == "No"]) / len(dff)
+        percentage = "{:.0%}".format(num)
+        return "\nIn {}, {} of households do not have food security.".format(
+            location_selected_option, percentage
+        )
+    if (health_selected_feature == "Government Assistance") & (int(len(dff))!=0):
+        num = len(dff[dff["Government Assistance"] == "No Assistance"]) / len(dff)
+        percentage = "{:.0%}".format(num)
+        return "\nIn {}, {} of households do not have govevernment assistance.".format(
+            location_selected_option, percentage
+        )
 
 @app.callback(
     Output("display-selected-values", "figure"),
@@ -399,6 +450,11 @@ def set_display_children(
                 "Floor Condition": False,
                 "Roof Condition": False,
                 "Latrine or Bathroom Access": False,
+                "Education Level": False,
+                "Stove Ventilation":False,
+                "House Material":False,
+                "Food Security":False,
+                "Government Assistance":False,
                 "Longitude": False,
                 "Latitude": False,
             },
@@ -423,6 +479,11 @@ def set_display_children(
                 "Floor Condition": True,
                 "Roof Condition": True,
                 "Latrine or Bathroom Access": True,
+                "Education Level":True,
+                "Stove Ventilation":True,
+                "House Material":True,
+                "Food Security":True,
+                "Government Assistance":True,
                 "Longitude": False,
                 "Latitude": False,
             },
@@ -438,11 +499,16 @@ def set_display_children(
                 "Floor Condition",
                 "Roof Condition",
                 "Latrine or Bathroom Access",
+                "Education Level",
+                "Stove Ventilation",
+                "House Material",
+                "Food Security",
+                "Government Assistance",
             ],
         )
 
         fig.update_traces(     
-            hovertemplate="<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}<extra></extra>"
+            hovertemplate="<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}<br> <b>Education Level:</b> %{customdata[6]}<br> <b>Stove Ventilation:</b> %{customdata[7]}<br> <b>House Material:</b> %{customdata[8]}<br> <b>Food Security:</b> %{customdata[9]}<br> <b>Government Assistance:</b> %{customdata[10]}<extra></extra>"
         )
         fig.update_traces(marker_size=15)  
 
@@ -454,7 +520,7 @@ def set_display_children(
     fig.update_layout(
         autosize=True,
         # margins=dict{l:0},
-        title="<b>        Dominican Republic Health Data by Household</b><br>        Hover over map for details",
+        title="<b>      Dominican Republic Health Data by Household</b><br>      Hover over map for details",
         title_font_color='black',
         title_font_size=17,
 
@@ -477,10 +543,11 @@ def set_display_children(
             yanchor="bottom",
             xanchor="left",
             y=-0.09,
-
+            # width = '90%'
+            # x=0
         ),
     )
-
+    # fig.update_layout(geo=dict(bgcolor= '#f8f7f6'))
     fig.update_layout(
         {"plot_bgcolor": "rgba(0, 0, 0, 0)", "paper_bgcolor": "rgba(0, 0, 0, 0)"}
     )

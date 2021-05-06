@@ -54,8 +54,6 @@ def post_merge_cleaning(df):
     df = df.drop_duplicates(subset=["client.objectId"])
     df = df.drop(columns=["client.objectId", "objectId_y"])
     df = df.rename(columns={"objectId_x": "objectId"})
-    df = df.replace({np.nan: ""})
-
     # Create new columns for latrine or bathroom access
     df.loc[
         (df["latrineAccess"] == "Yes") | (df["bathroomAccess"] == "Yes"),
@@ -65,6 +63,12 @@ def post_merge_cleaning(df):
         (df["latrineAccess"] == "No") & (df["bathroomAccess"] == "No"),
         "Latrine or Bathroom Access",
     ] = "No"
+
+    df.loc[
+        (df["latrineAccess"] == "") & (df["bathroomAccess"] == ""),
+        "Latrine or Bathroom Access",
+    ] = ""
+    df = df.replace({np.nan: ""})
 
     # Change numbers to digits without decimals for numerical columns
     # replace for age column
