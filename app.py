@@ -97,7 +97,6 @@ app.layout = html.Div(
                         },
                         style={
                             # This controls the Map Div
-
                             "height": "650px",
                             "background-color": "#f8f7f6",
                         },
@@ -117,7 +116,12 @@ app.layout = html.Div(
                     [
                         html.Div(
                             html.Label("Geographic Level of Detail"),
-                            style={"padding-top":"55px","font-family": "Roboto", "font-weight": "bold","font-size": '14px'},
+                            style={
+                                "padding-top": "55px",
+                                "font-family": "Roboto",
+                                "font-weight": "bold",
+                                "font-size": "14px",
+                            },
                         ),
                         html.Div(
                             [
@@ -138,7 +142,12 @@ app.layout = html.Div(
                     [
                         html.Div(
                             html.Label("Select Location..."),
-                            style={"padding-top":"5px","font-family": "Roboto", "font-weight": "bold","font-size": '14px'},
+                            style={
+                                "padding-top": "5px",
+                                "font-family": "Roboto",
+                                "font-weight": "bold",
+                                "font-size": "14px",
+                            },
                         ),
                         html.Div(
                             [
@@ -157,7 +166,11 @@ app.layout = html.Div(
                     [
                         html.Div(
                             html.Label("Household Features"),
-                            style={"font-family": "Roboto", "font-weight": "bold","font-size": '14px'},
+                            style={
+                                "font-family": "Roboto",
+                                "font-weight": "bold",
+                                "font-size": "14px",
+                            },
                         ),
                         html.Div(
                             [
@@ -179,7 +192,12 @@ app.layout = html.Div(
                     [
                         html.Div(
                             html.Label("Select Features..."),
-                            style={"padding-top":"5px","font-family": "Roboto", "font-weight": "bold","font-size": '14px'},
+                            style={
+                                "padding-top": "5px",
+                                "font-family": "Roboto",
+                                "font-weight": "bold",
+                                "font-size": "14px",
+                            },
                         ),
                         html.Div(
                             [
@@ -197,12 +215,15 @@ app.layout = html.Div(
                     style={"width": "100%"},
                     className="custom-dropdown",
                 ),
-                html.Hr(style={"margin-top": "20px","margin-bottom":"20px"}),
+                html.Hr(style={"margin-top": "20px", "margin-bottom": "20px"}),
                 html.Div(
                     id="dd-output-container",
-
-                    style={"margin-top": "0px","font-family": "Roboto", "font-size": "20px",'whiteSpace': 'pre-wrap'},
-
+                    style={
+                        "margin-top": "0px",
+                        "font-family": "Roboto",
+                        "font-size": "20px",
+                        "whiteSpace": "pre-wrap",
+                    },
                 ),
             ],
             style={
@@ -302,9 +323,11 @@ def update_output(
             ].iloc[0]
         else:
             water_filters = 0
+
         if water_filters >0:
             return "\nIn {}, {} of households have inadequate access to water. \n\n Puente has distributed {} water filters in this location.".format(
             location_selected_option, percentage,water_filters
+
 
             )
         else:
@@ -326,6 +349,7 @@ def update_output(
             ))
 
 
+
         else:
             return "\nIn {}, {} of households need flooring repairs.".format(
                 location_selected_option, percentage
@@ -345,14 +369,14 @@ def update_output(
             ].iloc[0]
         else:
             bathrooms = 0
-
         if  bathrooms > 0:
             return "\nIn {}, {} of households do not have access to latrines or bathrooms.\n\nPuente has helped install {} bathrooms in this location.".format(
             location_selected_option, percentage,bathrooms
+
             )
         else:
             return "\nIn {}, {} of households do not have access to latrines or bathrooms. \n \n ".format(
-            location_selected_option, percentage
+                location_selected_option, percentage
             )
 
 
@@ -407,7 +431,7 @@ def set_display_children(
 
     else:
         dff = dff[dff[health_selected_feature].isin(health_selected_option)]
-        dff = dff.replace('', 'No Data Available', regex=True)
+        dff = dff.replace("", "No Data Available", regex=True)
         lat_val = dff["Latitude"]
         lon_val = dff["Longitude"]
         fig = px.scatter_mapbox(
@@ -441,7 +465,7 @@ def set_display_children(
             ],
         )
 
-        fig.update_traces(     
+        fig.update_traces(
             hovertemplate="<span style='font-size:20px'><b>%{customdata[0]}</b> </span><br> <br> <b>Water Access:</b> %{customdata[1]}<br> <b>Clinic Access:</b> %{customdata[2]}<br> <b>Floor Condition:</b> %{customdata[3]}<br> <b>Roof Condition:</b> %{customdata[4]}<br> <b>Latrine or Bathroom Access:</b> %{customdata[5]}<extra></extra>"
         )
         fig.update_traces(marker_size=15)  
@@ -455,9 +479,8 @@ def set_display_children(
         autosize=True,
         # margins=dict{l:0},
         title="<b>        Dominican Republic Health Data by Household</b><br>        Hover over map for details",
-        title_font_color='black',
+        title_font_color="black",
         title_font_size=17,
-
         title_font_family="Roboto",
         font_family="Roboto",
         geo_scope="world",
